@@ -34,7 +34,7 @@ func extractLyricsToChannel(url string, ch chan models.Lyrics) {
 }
 
 func SearchLyrics(query string, apiKey string, ch chan models.Lyrics) {
-	urlChan := make(chan string, 3)
+	urlChan := make(chan string, 2) // "preload" the next url (speed-up in case of new api request)
 	go GoogleSearch(query, apiKey, urlChan)
 
 	for url := range urlChan {
