@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var AnimeLyricsOrigin = models.LyricsOrigin{Name: "musixMatch", Url: "musixmatch.com"}
+var AnimeLyricsOrigin = models.LyricsOrigin{Name: "Animelyrics", Url: "animelyrics.com"}
 
 type animeLyrics struct {
 	RegexCanHandle

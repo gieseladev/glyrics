@@ -15,6 +15,7 @@ func TestExtractor(t *testing.T) {
 	urls := []string{
 		"https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules",
 		"http://www.animelyrics.com/anime/haruhi/harehareyukaiemiri.htm",
+		"https://genius.com/Ed-sheeran-the-a-team-lyrics",
 	}
 
 	for _, url := range urls {
