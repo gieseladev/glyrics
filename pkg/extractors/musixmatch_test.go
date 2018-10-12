@@ -1,7 +1,7 @@
 package extractors
 
 import (
-	"github.com/gieseladev/lyricsfinder/pkg"
+	"github.com/gieseladev/lyricsfinder/pkg/models"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestMusixMatch_CanHandle(t *testing.T) {
-	req := lyricsfinder.Request{Url: "https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules"}
+	req := models.Request{Url: "https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules"}
 	defer req.Close()
 
 	if !MusixMatchExtractor.CanHandle(req) {
@@ -18,7 +18,7 @@ func TestMusixMatch_CanHandle(t *testing.T) {
 }
 
 func TestMusixMatch_ExtractLyrics(t *testing.T) {
-	req := lyricsfinder.Request{Url: "https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules"}
+	req := models.Request{Url: "https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules"}
 	defer req.Close()
 
 	lyrics, err := MusixMatchExtractor.ExtractLyrics(req)

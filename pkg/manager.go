@@ -3,16 +3,12 @@ package lyricsfinder
 import (
 	"errors"
 	"fmt"
+	"github.com/gieseladev/lyricsfinder/pkg/extractors"
+	"github.com/gieseladev/lyricsfinder/pkg/models"
 )
 
-var Extractors = make([]Extractor, 0)
-
-func RegisterExtractor(extractor Extractor) {
-	Extractors = append(Extractors, extractor)
-}
-
-func ExtractLyricsFromRequest(request Request) (*Lyrics, error) {
-	for _, extractor := range Extractors {
+func ExtractLyricsFromRequest(request models.Request) (*models.Lyrics, error) {
+	for _, extractor := range extractors.Extractors {
 		if extractor.CanHandle(request) {
 			lyrics, err := extractor.ExtractLyrics(request)
 			if err != nil {
@@ -26,18 +22,18 @@ func ExtractLyricsFromRequest(request Request) (*Lyrics, error) {
 	return nil, errors.New(fmt.Sprintf("No extractor could extract %+v", request))
 }
 
-func ExtractLyrics(url string) (*Lyrics, error) {
-	return ExtractLyricsFromRequest(Request{Url: url})
+func ExtractLyrics(url string) (*models.Lyrics, error) {
+	return ExtractLyricsFromRequest(models.Request{Url: url})
 }
 
-func extractLyricsToChannel(url string, ch chan Lyrics) {
+func extractLyricsToChannel(url string, ch chan models.Lyrics) {
 	lyrics, err := ExtractLyrics(url)
 	if err == nil {
 		ch <- *lyrics
 	}
 }
 
-func SearchLyrics(query string, apiKey string, ch chan Lyrics) {
+func SearchLyrics(query string, apiKey string, ch chan models.Lyrics) {
 	urlChan := make(chan string, 3)
 	go GoogleSearch(query, apiKey, urlChan)
 

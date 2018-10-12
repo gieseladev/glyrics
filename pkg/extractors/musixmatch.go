@@ -2,17 +2,17 @@ package extractors
 
 import (
 	"errors"
-	"github.com/gieseladev/lyricsfinder/pkg"
+	"github.com/gieseladev/lyricsfinder/pkg/models"
 	"regexp"
 	"strings"
 	"time"
 )
 
 type MusixMatch struct {
-	lyricsfinder.RegexCanHandle
+	RegexCanHandle
 }
 
-func (extractor *MusixMatch) ExtractLyrics(req lyricsfinder.Request) (*lyricsfinder.Lyrics, error) {
+func (extractor *MusixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -37,17 +37,17 @@ func (extractor *MusixMatch) ExtractLyrics(req lyricsfinder.Request) (*lyricsfin
 
 	date, _ := parseOrdinalDate("Jan 2 2006", rawDate)
 
-	return &lyricsfinder.Lyrics{Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
+	return &models.Lyrics{Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
 		Origin: &MusixMatchOrigin}, nil
 }
 
-var MusixMatchOrigin = lyricsfinder.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
-var MusixMatchExtractor = MusixMatch{lyricsfinder.RegexCanHandle{
+var MusixMatchOrigin = models.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
+var MusixMatchExtractor = MusixMatch{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`),
 }}
 
 func init() {
-	lyricsfinder.RegisterExtractor(&MusixMatchExtractor)
+	RegisterExtractor(&MusixMatchExtractor)
 }
 
 var dayOrdinals = map[string]string{ // map[ordinal]cardinal

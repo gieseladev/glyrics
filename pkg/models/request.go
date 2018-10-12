@@ -1,4 +1,4 @@
-package lyricsfinder
+package models
 
 import (
 	"github.com/PuerkitoBio/goquery"
