@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var MusixMatchOrigin = models.LyricsOrigin{Name: "musixMatch", Url: "musixmatch.com"}
+var MusixMatchOrigin = models.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
 
 type musixMatch struct {
 	RegexCanHandle
