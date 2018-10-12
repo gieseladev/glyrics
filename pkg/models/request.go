@@ -8,6 +8,7 @@ import (
 
 type Request struct {
 	Url      string
+	request  *http.Request
 	response *http.Response
 	text     string
 	document *goquery.Document
@@ -23,10 +24,17 @@ func (req *Request) Close() {
 	}
 }
 
+func (req *Request) Request() *http.Request {
+	if req.request == nil {
+		request, _ := http.NewRequest("GET", req.Url, nil)
+		req.request = request
+	}
+	return req.request
+}
+
 func (req *Request) Response() (*http.Response, error) {
 	if req.response == nil {
-		request, _ := http.NewRequest("GET", req.Url, nil)
-		request.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
+		request := req.Request()
 
 		resp, err := http.DefaultClient.Do(request)
 		if err != nil {
