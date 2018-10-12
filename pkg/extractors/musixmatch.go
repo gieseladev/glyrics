@@ -8,17 +8,22 @@ import (
 	"time"
 )
 
-type MusixMatch struct {
+var MusixMatchOrigin = models.LyricsOrigin{Name: "musixMatch", Url: "musixmatch.com"}
+
+type musixMatch struct {
 	RegexCanHandle
 }
 
-func (extractor *MusixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
+func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
+	req.Request().Header.Set("user-agent",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
+
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
 	}
 
-	if doc.Find("div.mxm-empty-state[\"data-reactid=87\"]").Length() > 0 {
+	if doc.Find(`div.mxm-empty-state[data-reactid="87"]`).Length() > 0 {
 		return nil, errors.New("no lyrics")
 	}
 
@@ -41,8 +46,7 @@ func (extractor *MusixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		Origin: &MusixMatchOrigin}, nil
 }
 
-var MusixMatchOrigin = models.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
-var MusixMatchExtractor = MusixMatch{RegexCanHandle{
+var MusixMatchExtractor = musixMatch{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`),
 }}
 
