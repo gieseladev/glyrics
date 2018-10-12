@@ -1,6 +1,8 @@
-package lyricsfinder
+package models
 
-import "time"
+import (
+	"time"
+)
 
 type LyricsOrigin struct {
 	Name string `json:"name"`

@@ -37,7 +37,9 @@ func GoogleSearch(query string, apiKey string, ch chan string) {
 		}
 
 		for _, item := range data.Items {
-			ch <- item.Link
+			if item.Link != "" {
+				ch <- item.Link
+			}
 		}
 
 		resp.Body.Close()
