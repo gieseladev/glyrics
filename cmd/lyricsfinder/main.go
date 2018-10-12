@@ -35,13 +35,19 @@ func printLyrics(lyrics *models.Lyrics) {
 func searchLyrics(c *cli.Context) {
 	query := strings.Join(c.Args(), " ")
 	apiKey := c.String("token")
+
+	config, err := internal.GetConfig()
 	if apiKey == "" {
-		config, err := internal.GetConfig()
 		if err != nil {
-			log.Fatal("No token passed and couldn't load config file", err)
+			log.Fatal("No token passed and couldn't load config file: ", err)
 		}
 
 		apiKey = config.GoogleApiKey
+	} else if err == nil {
+		config.GoogleApiKey = apiKey
+		config.SaveConfig()
+	} else {
+		internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
 	ch := make(chan models.Lyrics, 1)
@@ -60,7 +66,7 @@ func extractLyrics(c *cli.Context) {
 
 	lyrics, err := lyricsfinder.ExtractLyrics(url)
 	if err != nil {
-		log.Fatal("Couldn't extract lyrics", err)
+		log.Fatal("Couldn't extract lyrics: ", err)
 	}
 
 	printLyrics(lyrics)

@@ -12,8 +12,10 @@ func TestExtractors(t *testing.T) {
 }
 
 func TestExtractor(t *testing.T) {
-	urls := []string{"https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules",
-		"http://www.animelyrics.com/anime/haruhi/harehareyukaiemiri.htm"}
+	urls := []string{
+		"https://www.musixmatch.com/lyrics/Dua-Lipa/New-Rules",
+		"http://www.animelyrics.com/anime/haruhi/harehareyukaiemiri.htm",
+	}
 
 	for _, url := range urls {
 		_, err := ExtractLyrics(url)

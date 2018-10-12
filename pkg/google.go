@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	url2 "net/url"
 )
 
 type googleCustomSearchResult struct {
@@ -20,7 +21,7 @@ func GoogleSearch(query string, apiKey string, ch chan string) {
 		"&key=%s"+
 		"&cx=002017775112634544492:7y5bpl2sn78"+
 		"&fields=items(link)"+
-		"&num=%%d", query, apiKey)
+		"&num=%d&start=%%d", url2.QueryEscape(query), apiKey, itemCount)
 
 	for i := 1; i <= 100; i += itemCount {
 		// FIXME http.Get uses http.DefaultClient which doesn't have any timeout
@@ -33,7 +34,7 @@ func GoogleSearch(query string, apiKey string, ch chan string) {
 
 		err = json.NewDecoder(resp.Body).Decode(&data)
 		if err != nil {
-			panic(err)
+			continue
 		}
 
 		for _, item := range data.Items {
