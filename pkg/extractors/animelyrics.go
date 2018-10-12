@@ -13,7 +13,7 @@ type animeLyrics struct {
 	RegexCanHandle
 }
 
-var artistMatcher = regexp.MustCompile(`Performed by (?P<artist>[\w' ]+)\b`)
+var artistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
 
 func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
 	doc, err := req.Document()
@@ -25,7 +25,10 @@ func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics,
 
 	title := strings.TrimSpace(doc.Find("div~h1").First().Contents().First().Text())
 
-	artistMatch := artistMatcher.FindStringSubmatch(doc.Text())
+	artistSearchDoc := doc.Clone()
+	artistSearchDoc.Find("br").ReplaceWithHtml("\n")
+
+	artistMatch := artistMatcher.FindStringSubmatch(artistSearchDoc.Text())
 	if len(artistMatch) > 1 {
 		artist = artistMatch[1]
 	}

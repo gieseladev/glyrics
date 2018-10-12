@@ -15,6 +15,16 @@ func TestAnimeLyrics_ExtractLyricsTranslated(t *testing.T) {
 
 	ExpectLyricsFile(t, lyrics, "Futari no Kimochi no Honto no Himitsu", "Yasuna", time.Time{},
 		"../../test/testdata/lyrics/animelyrics-yasuna-fnknhnh.txt")
+
+	lyrics, err = AnimeLyricsExtractor.ExtractLyrics(
+		models.Request{Url: "http://www.animelyrics.com/anime/akamegakill/liarmask.htm"},
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	ExpectLyricsFile(t, lyrics, "Liar Mask", "Rika Mayama", time.Time{},
+		"../../test/testdata/lyrics/animelyrics-rika_mayama-liar_mask.txt")
 }
 
 func TestAnimeLyrics_ExtractLyricsUntranslated(t *testing.T) {

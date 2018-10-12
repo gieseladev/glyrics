@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"github.com/mitchellh/go-homedir"
 	"os"
+	"path"
 )
 
-type cliConfig struct {
+type CliConfig struct {
 	GoogleApiKey string `json:"google_api_key"`
 }
 
@@ -15,11 +16,11 @@ func openConfigFile() (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.Open(dir + "/.lyricsfinder")
+	file, err := os.OpenFile(path.Join(dir, ".lyricsfinder"), os.O_RDWR|os.O_CREATE, 0755)
 	return file, err
 }
 
-func (config *cliConfig) SaveConfig() error {
+func (config CliConfig) SaveConfig() error {
 	file, err := openConfigFile()
 	defer file.Close()
 	if err != nil {
@@ -29,14 +30,14 @@ func (config *cliConfig) SaveConfig() error {
 	return json.NewEncoder(file).Encode(config)
 }
 
-func GetConfig() (*cliConfig, error) {
+func GetConfig() (*CliConfig, error) {
 	file, err := openConfigFile()
 	defer file.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	var config cliConfig
+	var config CliConfig
 	err = json.NewDecoder(file).Decode(&config)
 	if err != nil {
 		return nil, err
