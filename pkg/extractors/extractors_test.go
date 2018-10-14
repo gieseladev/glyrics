@@ -13,16 +13,16 @@ import (
 )
 
 type lyricsTestCase struct {
-	Url         string    `json:"url"`
-	Extractor   string    `json:"extractor"`
-	Title       string    `json:"title"`
-	Artist      string    `json:"artist"`
-	ReleaseDate time.Time `json:"release_date"`
-	Lyrics      string    `json:"lyrics"`
+	Url         string    `yaml:"url"`
+	Extractor   string    `yaml:"extractor"`
+	Title       string    `yaml:"title"`
+	Artist      string    `yaml:"artist"`
+	ReleaseDate time.Time `yaml:"release_date"`
+	Lyrics      string    `yaml:"lyrics"`
 }
 
 func (test *lyricsTestCase) String() string {
-	return fmt.Sprintf("(%s) %s - %s", test.Extractor, test.Artist, test.Title)
+	return fmt.Sprintf("(%-16s) %s - %s", test.Extractor, test.Artist, test.Title)
 }
 
 func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
@@ -85,6 +85,8 @@ func getType(myvar interface{}) string {
 }
 
 func findExtractor(name string) Extractor {
+	name = strings.Replace(name, " ", "", -1)
+
 	for _, extractor := range Extractors {
 		extractorName := getType(extractor)
 		if strings.HasPrefix(strings.ToLower(extractorName), strings.ToLower(name)) {
@@ -100,17 +102,23 @@ func TestExtractors(t *testing.T) {
 	t.Logf("Testing %d case(s)", len(cases))
 
 	for _, testCase := range cases {
+		if testCase == (lyricsTestCase{}) {
+			t.Error("Empty test case, skipping!")
+			continue
+		}
+
 		t.Log(testCase.String())
+
 		extractor := findExtractor(testCase.Extractor)
 		if extractor == nil {
-			t.Errorf("Couldn't find extractor for %s", testCase.String())
+			t.Error("ERROR: Couldn't find extractor")
 			continue
 		}
 
 		req := models.Request{Url: testCase.Url}
 
 		if !extractor.CanHandle(req) {
-			t.Errorf("Extractor %s can't handle url %s", extractor, req.Url)
+			t.Errorf("ERROR: Extractor %s can't handle url %s", extractor, req.Url)
 		}
 
 		lyrics, err := extractor.ExtractLyrics(req)

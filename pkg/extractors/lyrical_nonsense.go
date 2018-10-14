@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var LyricalNonsenseOrigin = models.LyricsOrigin{Name: "LyricalNonsense", Url: "lyrical-nonsense.com"}
+var LyricalNonsenseOrigin = models.LyricsOrigin{Name: "Lyrical Nonsense", Url: "lyrical-nonsense.com"}
 
 type lyricalNonsense struct {
 	RegexCanHandle
@@ -29,7 +29,11 @@ func (extractor *lyricalNonsense) ExtractLyrics(req models.Request) (*models.Lyr
 	lyricsBuilder := strings.Builder{}
 
 	lyricsSel.First().Find("p").Each(func(i int, selection *goquery.Selection) {
-		lyricsBuilder.WriteString(selection.Text() + "\n\n")
+		for _, line := range strings.Split(selection.Text(), "\n") {
+			line = strings.TrimSpace(line)
+			lyricsBuilder.WriteString(line + "\n")
+		}
+		lyricsBuilder.WriteString("\n")
 	})
 
 	lyrics := strings.TrimSpace(lyricsBuilder.String())
