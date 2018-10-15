@@ -26,11 +26,12 @@ func (test *lyricsTestCase) String() string {
 	return fmt.Sprintf("(%-16s) %s - %s", test.Extractor, test.Artist, test.Title)
 }
 
-func (test *lyricsTestCase) MaybeSkip(t *testing.T) {
+func (test *lyricsTestCase) ShouldSkip(t *testing.T) bool {
 	if test.SkipIf == "travis" && os.Getenv("TRAVIS") == "true" {
-		t.Logf("> Skipping Case on Travis!")
-		t.SkipNow()
+		return true
 	}
+
+	return false
 }
 
 func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
@@ -116,7 +117,10 @@ func TestExtractors(t *testing.T) {
 		}
 
 		t.Log(testCase.String())
-		testCase.MaybeSkip(t)
+		if testCase.ShouldSkip(t) {
+			t.Log("> Skipped")
+			continue
+		}
 
 		extractor := findExtractor(testCase.Extractor)
 		if extractor == nil {
