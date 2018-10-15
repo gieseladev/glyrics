@@ -4,7 +4,7 @@ go:
 - "1.x"
 - "1.11.x"
 
-go_import_path: github.com/gieseladev/lyricsfindergo
+go_import_path: github.com/gieseladev/lyricsfinder
 
 deploy:
   provider: releases
