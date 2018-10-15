@@ -13,16 +13,24 @@ import (
 )
 
 type lyricsTestCase struct {
-	Url         string    `yaml:"url"`
-	Extractor   string    `yaml:"extractor"`
-	Title       string    `yaml:"title"`
-	Artist      string    `yaml:"artist"`
+	SkipIf      string
+	Url         string
+	Extractor   string
+	Title       string
+	Artist      string
 	ReleaseDate time.Time `yaml:"release_date"`
-	Lyrics      string    `yaml:"lyrics"`
+	Lyrics      string
 }
 
 func (test *lyricsTestCase) String() string {
 	return fmt.Sprintf("(%-16s) %s - %s", test.Extractor, test.Artist, test.Title)
+}
+
+func (test *lyricsTestCase) MaybeSkip(t *testing.T) {
+	if test.SkipIf == "travis" && os.Getenv("TRAVIS") == "true" {
+		t.Logf("> Skipping Case on Travis!")
+		t.SkipNow()
+	}
 }
 
 func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
@@ -108,6 +116,7 @@ func TestExtractors(t *testing.T) {
 		}
 
 		t.Log(testCase.String())
+		testCase.MaybeSkip(t)
 
 		extractor := findExtractor(testCase.Extractor)
 		if extractor == nil {
@@ -124,6 +133,7 @@ func TestExtractors(t *testing.T) {
 		lyrics, err := extractor.ExtractLyrics(req)
 		if err != nil {
 			t.Error(err)
+			continue
 		}
 
 		testCase.Test(t, lyrics)
