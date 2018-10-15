@@ -7,11 +7,14 @@ go:
 
 go_import_path: github.com/gieseladev/lyricsfinder
 
+before_deploy:
+- go build -o build/lyricsfinder github.com/gieseladev/lyricsfinder/cmd/lyricsfinder
+
 deploy:
   provider: releases
   api_key:
     secure: J0zPk+c6Fb6SwieBYns0yLrSl9NbIz6vK+fmi1xgH3jWXN3pTFnboIXblAmRNeQOQI055/q1YkpHVHVa+LC8mwWINkNTzxHd8TFcE27fkRzJhwZeUjTYzKJpTb/BjEf3sZZqv54dgYuansQ+b+uqk58jzoGjXH/2vJuWjV0Co0PkfIxlgSLX7VAAfto4vmZUI4LXqVtJRJcio9YaiHV/qJ6rhKooupvIz460tqhp7iJaNR5hvsTYTQ7q7K2WJEfUdDDw2HD2nozn4Teb4jCFhiWogbQPZ6rKSTH4n8NgzrZutllFFrlQmm0bEBHifoKdktp7kmZuR20AJJ6ESF5O/d9QCEuIeyW2pi0Rd18x8cKzHMFFgEBoPFJUUYQG1KGHjmVVrpdq5+aH9Fkotkh8Wke7CIna6lYIl35j6cpDDLEglOZNv9luOWZylkOb5wA/kalLeaepy/s7lMfjOoQeTAvWNxDei82mjOBjQnehlhqtZtBWfO7MWoqRvZ8+Iddaja9MKiNyKslh2miLTWClBAWCNl3khPRvS+wxZc3rGFrtXS2zL3uvqFWyhha3k3vTLYJll8kIJj1iXj3dwc9n5fOlZuwWQRnzPFHPZXzAZUfWBHRI4gp5V5ykpke0IH5gpztHNOy3walTismcUyYwBMNP1S/ZThZzuHvFL3yfRpc=
-  file: pass
+  file: build/lyricsfinder/*
   skip_cleanup: true
-  on:
-    tags: true
+#  on:
+#    tags: true
