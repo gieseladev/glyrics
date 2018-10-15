@@ -1,3 +1,4 @@
+skipif: travis
 url: https://www.azlyrics.com/lyrics/edsheeran/theateam.html
 extractor: AZLyrics
 title: "The A Team"
