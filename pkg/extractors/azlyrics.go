@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"errors"
-	"github.com/gieseladev/lyricsfinder/pkg/models"
+	"github.com/gieseladev/lyricsfindergo/pkg/models"
 	"regexp"
 	"strings"
 )

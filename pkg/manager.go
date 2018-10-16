@@ -3,8 +3,8 @@ package lyricsfinder
 import (
 	"errors"
 	"fmt"
-	"github.com/gieseladev/lyricsfinder/pkg/extractors"
-	"github.com/gieseladev/lyricsfinder/pkg/models"
+	"github.com/gieseladev/lyricsfindergo/pkg/extractors"
+	"github.com/gieseladev/lyricsfindergo/pkg/models"
 )
 
 func ExtractLyricsFromRequest(request models.Request) (*models.Lyrics, error) {

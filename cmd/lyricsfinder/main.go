@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gieseladev/lyricsfinder/internal"
-	"github.com/gieseladev/lyricsfinder/pkg"
-	"github.com/gieseladev/lyricsfinder/pkg/models"
+	"github.com/gieseladev/lyricsfindergo/internal"
+	"github.com/gieseladev/lyricsfindergo/pkg"
+	"github.com/gieseladev/lyricsfindergo/pkg/models"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -75,6 +75,7 @@ func extractLyrics(c *cli.Context) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "lyricsfinder"
+	app.Description = "Find the lyrics you've always wanted to find"
 	app.Version = "2.1.1"
 
 	app.Commands = []cli.Command{

@@ -1,7 +1,7 @@
 package lyricsfinder
 
 import (
-	"github.com/gieseladev/lyricsfinder/pkg/extractors"
+	"github.com/gieseladev/lyricsfindergo/pkg/extractors"
 	"testing"
 )
 
