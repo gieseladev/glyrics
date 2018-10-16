@@ -1,15 +1,16 @@
 language: go
 
-go:
-- 1.x
-- 1.10.x
-- 1.11.x
+matrix:
+  fast_finish: true
+  include:
+  - go: 1.x
+  - go: 1.10.x
+  - go: 1.11.x
+    env:
+    - GOOS=linux GOARCH=amd64
+    - GOOS=windows GOARCH=amd64
 
 go_import_path: github.com/gieseladev/lyricsfindergo
-
-env:
-- GOOS=linux GOARCH=amd64
-- GOOS=windows GOARCH=amd64
 
 before_deploy:
 - go build -o build/lyricsfinder-$(GOOS)_$(GOARCH) github.com/gieseladev/lyricsfinder/cmd/lyricsfinder
