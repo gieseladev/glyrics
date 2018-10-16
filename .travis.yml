@@ -5,6 +5,8 @@ go:
 - 1.10.x
 - 1.11.x
 
+go_import_path: github.com/gieseladev/lyricsfindergo
+
 env:
 - GOOS=linux GOARCH=amd64
 - GOOS=windows GOARCH=amd64
