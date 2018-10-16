@@ -50,10 +50,8 @@ func searchLyrics(c *cli.Context) {
 		internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
-	ch := make(chan models.Lyrics, 1)
-	go lyricsfinder.SearchLyrics(query, apiKey, ch)
+	lyrics := lyricsfinder.SearchFirstLyrics(query, apiKey)
 
-	lyrics := <-ch
 	if lyrics != (models.Lyrics{}) {
 		printLyrics(&lyrics)
 	} else {
@@ -76,7 +74,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "lyricsfinder"
 	app.Description = "Find the lyrics you've always wanted to find"
-	app.Version = "2.1.1"
+	app.Version = "2.1.2"
 
 	app.Commands = []cli.Command{
 		{

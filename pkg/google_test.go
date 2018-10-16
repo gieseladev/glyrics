@@ -13,7 +13,7 @@ func TestGoogleSearch(t *testing.T) {
 	}
 
 	ch := make(chan string)
-	go GoogleSearch("test", apiKey, ch)
+	go GoogleSearch("test", apiKey, ch, nil)
 
 	select {
 	case link := <-ch:

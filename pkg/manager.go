@@ -33,13 +33,24 @@ func extractLyricsToChannel(url string, ch chan models.Lyrics) {
 	}
 }
 
-func SearchLyrics(query string, apiKey string, ch chan models.Lyrics) {
+func SearchLyrics(query string, apiKey string, ch chan models.Lyrics, stopSignal chan bool) {
 	urlChan := make(chan string, 2) // "preload" the next url (speed-up in case of new api request)
-	go GoogleSearch(query, apiKey, urlChan)
+	go GoogleSearch(query, apiKey, urlChan, stopSignal)
 
 	for url := range urlChan {
-		go extractLyricsToChannel(url, ch)
+		extractLyricsToChannel(url, ch)
 	}
 
 	close(ch)
+}
+
+func SearchFirstLyrics(query string, apiKey string) models.Lyrics {
+	lyricsChan := make(chan models.Lyrics)
+	stopChan := make(chan bool)
+	go SearchLyrics(query, apiKey, lyricsChan, stopChan)
+
+	lyrics := <-lyricsChan
+	stopChan <- true
+
+	return lyrics
 }

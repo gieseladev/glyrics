@@ -2,6 +2,8 @@ package lyricsfinder
 
 import (
 	"github.com/gieseladev/lyricsfindergo/pkg/extractors"
+	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"os"
 	"testing"
 )
 
@@ -24,5 +26,17 @@ func TestExtractor(t *testing.T) {
 		if err != nil {
 			t.Error("url:", url, "error:", err)
 		}
+	}
+}
+
+func TestSearchFirstLyrics(t *testing.T) {
+	apiKey := os.Getenv("GOOGLE_API_KEY")
+	if apiKey == "" {
+		t.Fatal("GOOGLE_API_KEY not set!")
+	}
+
+	lyrics := SearchFirstLyrics("The a Team", apiKey)
+	if lyrics == (models.Lyrics{}) {
+		t.Error("Didn't get any lyrics!")
 	}
 }
