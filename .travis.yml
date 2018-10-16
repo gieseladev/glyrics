@@ -5,10 +5,16 @@ matrix:
   include:
   - go: 1.x
   - go: 1.10.x
-  - go: 1.11.x
+  - name: linux/amd64 build
+    go: 1.11.x
     env:
-    - GOOS=linux GOARCH=amd64
-    - GOOS=windows GOARCH=amd64
+    - GOOS=linux
+    - GOARCH=amd64
+  - name: windows/amd64 build
+    go: 1.11.x
+    env:
+    - GOOS=windows
+    - GOARCH=amd64
 
 go_import_path: github.com/gieseladev/lyricsfindergo
 
