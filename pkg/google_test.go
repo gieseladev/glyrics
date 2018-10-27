@@ -12,15 +12,16 @@ func TestGoogleSearch(t *testing.T) {
 		t.Fatal("GOOGLE_API_KEY not set!")
 	}
 
-	ch := make(chan string)
-	go GoogleSearch("test", apiKey, ch, nil)
+	urls, stop := GoogleSearch("test", apiKey)
 
 	select {
-	case link := <-ch:
+	case link := <-urls:
 		if link == "" {
 			t.Error("Didn't get any links!")
 		}
 	case <-time.After(5 * time.Second):
 		t.Error("Google Search timed out")
 	}
+
+	stop <- true
 }
