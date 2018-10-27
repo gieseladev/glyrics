@@ -42,7 +42,10 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 
 	rawDate := doc.Find("div.mxm-track-footer__album h3.mui-cell__subtitle").Text()
 
-	date, _ := parseOrdinalDate("Jan 2 2006", rawDate)
+	date, err := parseOrdinalDate("Jan 2 2006", rawDate)
+	if err != nil {
+		date = time.Time{}
+	}
 
 	return &models.Lyrics{Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
 		Origin: &MusixMatchOrigin}, nil

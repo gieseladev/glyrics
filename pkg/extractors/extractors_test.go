@@ -22,7 +22,7 @@ type lyricsTestCase struct {
 	Lyrics      string
 }
 
-func (test *lyricsTestCase) String() string {
+func (test lyricsTestCase) String() string {
 	return fmt.Sprintf("(%-16s) %s - %s", test.Extractor, test.Artist, test.Title)
 }
 
