@@ -10,6 +10,7 @@ type LyricsOrigin struct {
 }
 
 type Lyrics struct {
+	Url         string        `json:"url"`
 	Title       string        `json:"title"`
 	Artist      string        `json:"artist"`
 	Lyrics      string        `json:"lyrics"`

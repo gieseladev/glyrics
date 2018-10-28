@@ -62,7 +62,7 @@ func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics,
 
 	lyrics = strings.TrimSpace(strings.Replace(lyrics, "\u00a0", " ", -1))
 
-	return &models.Lyrics{Title: title, Artist: artist, Lyrics: lyrics,
+	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		Origin: &AnimeLyricsOrigin}, nil
 }
 

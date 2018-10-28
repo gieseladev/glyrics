@@ -38,7 +38,7 @@ func (extractor *lyricalNonsense) ExtractLyrics(req models.Request) (*models.Lyr
 
 	lyrics := strings.TrimSpace(lyricsBuilder.String())
 
-	return &models.Lyrics{Title: title, Artist: artist, Lyrics: lyrics,
+	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		Origin: &LyricalNonsenseOrigin}, nil
 }
 

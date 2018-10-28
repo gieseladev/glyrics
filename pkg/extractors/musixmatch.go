@@ -47,7 +47,7 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		date = time.Time{}
 	}
 
-	return &models.Lyrics{Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
+	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
 		Origin: &MusixMatchOrigin}, nil
 }
 

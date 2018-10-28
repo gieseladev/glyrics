@@ -36,7 +36,7 @@ func (extractor *geniusLyrics) ExtractLyrics(req models.Request) (*models.Lyrics
 
 	lyrics := strings.TrimSpace(doc.Find("div.lyrics").First().Text())
 
-	return &models.Lyrics{Title: title, Artist: artist, Lyrics: lyrics,
+	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		ReleaseDate: releaseDate,
 		Origin:      &GeniusOrigin}, nil
 }

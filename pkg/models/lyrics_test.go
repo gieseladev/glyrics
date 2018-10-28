@@ -10,7 +10,7 @@ import (
 
 func TestLyrics_MarshalJSON(t *testing.T) {
 	releaseDate := time.Now()
-	lyrics := Lyrics{Title: "Title", Artist: "Artist", Lyrics: "Lyrics",
+	lyrics := Lyrics{Url: "Url", Title: "Title", Artist: "Artist", Lyrics: "Lyrics",
 		ReleaseDate: releaseDate,
 		Origin:      &LyricsOrigin{Name: "SourceName", Url: "SourceURL"},
 	}
@@ -21,7 +21,7 @@ func TestLyrics_MarshalJSON(t *testing.T) {
 	}
 
 	dateRep, _ := releaseDate.MarshalJSON()
-	expectedRep := []byte(fmt.Sprintf(`{"title":"Title","artist":"Artist","lyrics":"Lyrics",`+
+	expectedRep := []byte(fmt.Sprintf(`{"url":"Url","title":"Title","artist":"Artist","lyrics":"Lyrics",`+
 		`"release_date":%s,"origin":{"name":"SourceName","url":"SourceURL"}}`, dateRep))
 
 	if !bytes.Equal(rep, expectedRep) {
