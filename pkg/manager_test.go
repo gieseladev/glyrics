@@ -35,7 +35,7 @@ func TestSearchFirstLyrics(t *testing.T) {
 		t.Fatal("GOOGLE_API_KEY not set!")
 	}
 
-	lyrics := SearchFirstLyrics("The a Team", apiKey)
+	lyrics := SearchFirstLyrics("I dunno what to lookup anymore", apiKey)
 	if lyrics == (models.Lyrics{}) {
 		t.Error("Didn't get any lyrics!")
 	}

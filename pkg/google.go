@@ -23,8 +23,8 @@ func GoogleSearch(query string, apiKey string) (<-chan string, chan<- bool) {
 		"&fields=items(link)"+
 		"&num=%d&start=%%d", url2.QueryEscape(query), apiKey, itemCount)
 
-	urlChan := make(chan string, 3)
-	stopSignal := make(chan bool)
+	urlChan := make(chan string, itemCount)
+	stopSignal := make(chan bool, 1)
 
 	go func() {
 		defer close(urlChan)
@@ -41,8 +41,9 @@ func GoogleSearch(query string, apiKey string) (<-chan string, chan<- bool) {
 
 			err = json.NewDecoder(resp.Body).Decode(&data)
 			resp.Body.Close()
+
 			if err != nil {
-				continue
+				break SearchLoop
 			}
 
 			for _, item := range data.Items {

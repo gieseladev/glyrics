@@ -30,14 +30,14 @@ func SearchLyrics(query string, apiKey string) (<-chan models.Lyrics, chan<- boo
 	urlChan, stopChan := GoogleSearch(query, apiKey)
 
 	go func() {
+		defer close(lyricsChan)
+
 		for url := range urlChan {
 			lyrics, err := ExtractLyrics(url)
 			if err == nil {
 				lyricsChan <- *lyrics
 			}
 		}
-
-		close(lyricsChan)
 	}()
 
 	return lyricsChan, stopChan
