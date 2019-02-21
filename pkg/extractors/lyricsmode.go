@@ -13,7 +13,7 @@ type lyricsMode struct {
 	RegexCanHandle
 }
 
-var ArtistTitleSplit = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
+var artistTitleSplit = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
 
 func (extractor *lyricsMode) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
 	doc, err := req.Document()
@@ -24,7 +24,7 @@ func (extractor *lyricsMode) ExtractLyrics(req models.Request) (*models.Lyrics, 
 	header := doc.Find("h1.song_name.fs32").Text()
 
 	var artist, title string
-	match := ArtistTitleSplit.FindStringSubmatch(header)
+	match := artistTitleSplit.FindStringSubmatch(header)
 	if len(match) >= 2 {
 		artist = match[1]
 		title = match[2]
