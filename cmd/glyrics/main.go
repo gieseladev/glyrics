@@ -45,9 +45,9 @@ func searchLyrics(c *cli.Context) {
 		apiKey = config.GoogleApiKey
 	} else if err == nil {
 		config.GoogleApiKey = apiKey
-		config.SaveConfig()
+		_ = config.SaveConfig()
 	} else {
-		internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
+		_ = internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
 	lyrics := glyrics.SearchFirstLyrics(query, apiKey)
@@ -73,7 +73,8 @@ func extractLyrics(c *cli.Context) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "gLyrics"
-	app.Description = "Find the lyrics you've always wanted to find"
+	app.Usage = "find the lyrics you've always wanted to find"
+	app.Description = "This is a command line tool to access the power of gLyrics."
 	app.Version = "2.2.0"
 
 	app.Commands = []cli.Command{
@@ -81,7 +82,11 @@ func main() {
 			Name:    "search",
 			Aliases: []string{"s"},
 			Usage:   "Search for lyrics",
-			Action:  searchLyrics,
+			Description: "Uses google custom search to find the most accurate lyrics for you. " +
+				"Requires an api key with access to the custom search api. " +
+				"This token is only required the first time.",
+			ArgsUsage: "query",
+			Action:    searchLyrics,
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:   "token",
@@ -92,10 +97,11 @@ func main() {
 			},
 		},
 		{
-			Name:    "extract",
-			Aliases: []string{"e"},
-			Usage:   "Extract lyrics from url",
-			Action:  extractLyrics,
+			Name:      "extract",
+			Aliases:   []string{"e"},
+			Usage:     "Extract lyrics from url",
+			ArgsUsage: "url",
+			Action:    extractLyrics,
 		},
 	}
 
