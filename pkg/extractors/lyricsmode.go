@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"errors"
-	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/models"
 	"regexp"
 	"strings"
 )
@@ -32,7 +32,10 @@ func (extractor *lyricsMode) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		return nil, errors.New("couldn't find title and artist")
 	}
 
-	lyrics := strings.TrimSpace(doc.Find("p#lyrics_text").First().Text())
+	lyricsContainer := doc.Find("#lyrics_text").First()
+	lyricsContainer.Children().RemoveFiltered("div.hide")
+
+	lyrics := strings.TrimSpace(lyricsContainer.Text())
 
 	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		Origin: &LyricsModeOrigin}, nil

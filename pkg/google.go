@@ -1,4 +1,4 @@
-package lyricsfinder
+package glyrics
 
 import (
 	"encoding/json"
@@ -13,6 +13,10 @@ type googleCustomSearchResult struct {
 	} `json:"items"`
 }
 
+// GoogleSearch performs a google custom search with a search engine strongly
+// optimised for lyrics. It returns a channel which yields all urls of the search
+// results in order and a channel which can be used to stop the search.
+// If not stopped the search channel will yield 100 search results.
 func GoogleSearch(query string, apiKey string) (<-chan string, chan<- bool) {
 	itemCount := 10
 
@@ -40,7 +44,7 @@ func GoogleSearch(query string, apiKey string) (<-chan string, chan<- bool) {
 			var data googleCustomSearchResult
 
 			err = json.NewDecoder(resp.Body).Decode(&data)
-			resp.Body.Close()
+			_ = resp.Body.Close()
 
 			if err != nil {
 				break SearchLoop

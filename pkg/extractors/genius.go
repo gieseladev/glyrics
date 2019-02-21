@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/models"
 	"regexp"
 	"strings"
 	"time"

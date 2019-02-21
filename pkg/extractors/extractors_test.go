@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"fmt"
-	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/models"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"

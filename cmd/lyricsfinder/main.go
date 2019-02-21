@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gieseladev/lyricsfindergo/internal"
-	"github.com/gieseladev/lyricsfindergo/pkg"
-	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"github.com/gieseladev/glyrics/internal"
+	"github.com/gieseladev/glyrics/pkg"
+	"github.com/gieseladev/glyrics/pkg/models"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -50,7 +50,7 @@ func searchLyrics(c *cli.Context) {
 		internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
-	lyrics := lyricsfinder.SearchFirstLyrics(query, apiKey)
+	lyrics := glyrics.SearchFirstLyrics(query, apiKey)
 
 	if lyrics != (models.Lyrics{}) {
 		printLyrics(&lyrics)
@@ -62,7 +62,7 @@ func searchLyrics(c *cli.Context) {
 func extractLyrics(c *cli.Context) {
 	url := c.Args().First()
 
-	lyrics, err := lyricsfinder.ExtractLyrics(url)
+	lyrics, err := glyrics.ExtractLyrics(url)
 	if err != nil {
 		log.Fatal("Couldn't extract lyrics: ", err)
 	}
@@ -72,9 +72,9 @@ func extractLyrics(c *cli.Context) {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "lyricsfinder"
+	app.Name = "gLyrics"
 	app.Description = "Find the lyrics you've always wanted to find"
-	app.Version = "2.1.2"
+	app.Version = "2.2.0"
 
 	app.Commands = []cli.Command{
 		{

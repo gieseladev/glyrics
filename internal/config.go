@@ -7,6 +7,7 @@ import (
 	"path"
 )
 
+// CliConfig
 type CliConfig struct {
 	GoogleApiKey string `json:"google_api_key"`
 }
@@ -16,13 +17,13 @@ func openConfigFile() (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile(path.Join(dir, ".lyricsfinder"), os.O_RDWR|os.O_CREATE, 0755)
+	file, err := os.OpenFile(path.Join(dir, ".glyrics"), os.O_RDWR|os.O_CREATE, 0755)
 	return file, err
 }
 
 func (config CliConfig) SaveConfig() error {
 	file, err := openConfigFile()
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	if err != nil {
 		return err
 	}
@@ -32,7 +33,7 @@ func (config CliConfig) SaveConfig() error {
 
 func GetConfig() (*CliConfig, error) {
 	file, err := openConfigFile()
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package lyricsfinder
+package glyrics
 
 import (
 	"os"

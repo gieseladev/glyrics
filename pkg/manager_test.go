@@ -1,8 +1,8 @@
-package lyricsfinder
+package glyrics
 
 import (
-	"github.com/gieseladev/lyricsfindergo/pkg/extractors"
-	"github.com/gieseladev/lyricsfindergo/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/extractors"
+	"github.com/gieseladev/glyrics/pkg/models"
 	"os"
 	"testing"
 )
