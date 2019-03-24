@@ -29,14 +29,14 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		return nil, errors.New("no lyrics")
 	}
 
-	window := doc.Find("div.mxm-lyrics span")
+	window := doc.Find(".mxm-lyrics__content")
 	if window.Length() == 0 {
 		return nil, errors.New("no lyrics")
 	}
 
 	window.Find("script").ReplaceWithHtml("\n\n")
 
-	lyrics := window.First().Text()
+	lyrics := window.Text()
 	title := strings.TrimSpace(doc.Find("h1.mxm-track-title__track").First().Text())[6:]
 	artist := doc.Find("a.mxm-track-title__artist").First().Text()
 
