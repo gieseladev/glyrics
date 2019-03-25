@@ -14,6 +14,18 @@ type azLyrics struct {
 	RegexCanHandle
 }
 
+const (
+	// format: `"<title>" lyrics`
+	titlePrefixLen = len(`"`)
+	titleSuffixLen = len(`" lyrics`)
+	titleMinLen    = titlePrefixLen + titleSuffixLen
+
+	// format: `<artist> Lyrics`
+	artistPrefixLen = 0
+	artistSuffixLen = len(` Lyrics`)
+	artistMinLen    = artistPrefixLen + artistSuffixLen
+)
+
 func (extractor *azLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
 	req.Request().Header.Set(
 		"user-agent",
@@ -25,16 +37,30 @@ func (extractor *azLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, er
 		return nil, err
 	}
 
+	// check for the presence of the sorting buttons
+	if sortingButtons := doc.Find(".btn.sorting"); sortingButtons.Length() != 0 {
+		return nil, errors.New("not a lyrics page")
+	}
+
 	center := doc.Find("div.text-center:not(.noprint)")
 	if center.Length() == 0 {
 		return nil, errors.New("no lyrics found")
 	}
 
 	title := strings.TrimSpace(center.Find("h1").Text())
-	title = title[1 : len(title)-8]
+	// using <= because a literally empty title is just as implausible
+	if len(title) <= titleMinLen {
+		return nil, errors.New("no title found, suspecting no lyrics page")
+	}
+
+	title = title[titlePrefixLen : len(title)-titleSuffixLen]
 
 	artist := doc.Find("div.lyricsh h2 b").Text()
-	artist = artist[:len(artist)-7]
+	if len(artist) > artistMinLen {
+		artist = artist[artistPrefixLen : len(artist)-artistSuffixLen]
+	} else {
+		artist = ""
+	}
 
 	lyrics := strings.TrimSpace(center.Find("div:not([class])").First().Text())
 
