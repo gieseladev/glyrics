@@ -75,7 +75,7 @@ func main() {
 	app.Name = "gLyrics"
 	app.Usage = "find the lyrics you've always wanted to find"
 	app.Description = "This is a command line tool to access the power of gLyrics."
-	app.Version = "2.2.0"
+	app.Version = "2.2.1"
 
 	app.Commands = []cli.Command{
 		{
