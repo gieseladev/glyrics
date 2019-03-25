@@ -36,23 +36,23 @@ func (test *lyricsTestCase) ShouldSkip(t *testing.T) bool {
 
 func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
 	if test.Title != lyrics.Title {
-		t.Errorf("Title %q didn't match: %q", lyrics.Title, test.Title)
+		t.Errorf("Title %q didn't match expected: %q", lyrics.Title, test.Title)
 	}
 	if test.Artist != lyrics.Artist {
-		t.Errorf("Artist %q didn't match: %q", lyrics.Artist, test.Artist)
+		t.Errorf("Artist %q didn't match expected: %q", lyrics.Artist, test.Artist)
 	}
 	if test.ReleaseDate != lyrics.ReleaseDate {
-		t.Errorf("Date %s didn't match: %s", lyrics.ReleaseDate, test.ReleaseDate)
+		t.Errorf("Date %s didn't match expected: %s", lyrics.ReleaseDate, test.ReleaseDate)
 	}
 	if test.Lyrics != lyrics.Lyrics {
-		t.Errorf("Lyrics didn't match:\n====\n%q\n====\nVS\n====\n%q\n====", lyrics.Lyrics, test.Lyrics)
+		t.Errorf("Lyrics didn't match:\n====\n%q\n====\nVS EXPECTED\n====\n%q\n====", lyrics.Lyrics, test.Lyrics)
 	}
 
 	if lyrics.Origin == nil {
-		t.Errorf("Lyrics don't have an origin: %s", lyrics)
+		t.Errorf("Lyrics don't have an origin: %v", lyrics)
 	}
 	if test.Extractor != lyrics.Origin.Name {
-		t.Errorf("Origin %q didn't match: %q", lyrics.Origin.Name, test.Extractor)
+		t.Errorf("Origin %q didn't match expected: %q", lyrics.Origin.Name, test.Extractor)
 	}
 }
 

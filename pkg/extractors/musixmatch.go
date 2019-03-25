@@ -2,6 +2,7 @@ package extractors
 
 import (
 	"errors"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gieseladev/glyrics/pkg/models"
 	"regexp"
 	"strings"
@@ -37,7 +38,13 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 
 	window.Find("script").ReplaceWithHtml("\n\n")
 
-	lyrics := window.Text()
+	var lyricsBuilder strings.Builder
+	window.Each(func(i int, selection *goquery.Selection) {
+		lyricsBuilder.WriteString(selection.Text())
+		lyricsBuilder.WriteRune('\n')
+	})
+
+	lyrics := strings.TrimSpace(lyricsBuilder.String())
 	title := strings.TrimSpace(doc.Find("h1.mxm-track-title__track").First().Text())[6:]
 	artist := doc.Find("a.mxm-track-title__artist").First().Text()
 
