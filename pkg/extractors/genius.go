@@ -1,6 +1,7 @@
 package extractors
 
 import (
+	"errors"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gieseladev/glyrics/pkg/models"
 	"regexp"
@@ -36,6 +37,10 @@ func (extractor *geniusLyrics) ExtractLyrics(req models.Request) (*models.Lyrics
 	releaseDate, _ := time.Parse("January 2, 2006", rawDate)
 
 	lyrics := strings.TrimSpace(doc.Find("div.lyrics").First().Text())
+
+	if lyrics == "" {
+		return nil, errors.New("no lyrics found")
+	}
 
 	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		ReleaseDate: releaseDate,
