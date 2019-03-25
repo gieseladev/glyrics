@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// LyricsModeOrigin is the models.LyricsOrigin for LyricsMode.
 var LyricsModeOrigin = models.LyricsOrigin{Name: "LyricsMode", Url: "lyricsmode.com"}
 
 type lyricsMode struct {
@@ -41,6 +42,7 @@ func (extractor *lyricsMode) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		Origin: &LyricsModeOrigin}, nil
 }
 
+// LyricsModeExtractor is the Extractor instance used for LyricsMode
 var LyricsModeExtractor = lyricsMode{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?lyricsmode.com/.*`),
 }}

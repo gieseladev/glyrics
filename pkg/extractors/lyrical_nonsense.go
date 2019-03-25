@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// LyricalNonsenseOrigin is the models.LyricsOrigin for Lyrical Nonsense.
 var LyricalNonsenseOrigin = models.LyricsOrigin{Name: "Lyrical Nonsense", Url: "lyrical-nonsense.com"}
 
 type lyricalNonsense struct {
@@ -42,6 +43,7 @@ func (extractor *lyricalNonsense) ExtractLyrics(req models.Request) (*models.Lyr
 		Origin: &LyricalNonsenseOrigin}, nil
 }
 
+// LyricalNonsenseExtractor is the Extractor instance used for Lyrical Nonsense
 var LyricalNonsenseExtractor = lyricalNonsense{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?lyrical-nonsense.com/lyrics/.*`),
 }}

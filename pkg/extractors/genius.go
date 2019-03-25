@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// GeniusOrigin is the models.LyricsOrigin for Genius.
 var GeniusOrigin = models.LyricsOrigin{Name: "Genius", Url: "genius.com"}
 
 type geniusLyrics struct {
@@ -41,6 +42,7 @@ func (extractor *geniusLyrics) ExtractLyrics(req models.Request) (*models.Lyrics
 		Origin:      &GeniusOrigin}, nil
 }
 
+// GeniusLyricsExtractor is the Extractor instance used for Genius
 var GeniusLyricsExtractor = geniusLyrics{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?genius.com/.*`),
 }}

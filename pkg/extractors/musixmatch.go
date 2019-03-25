@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// MusixMatchOrigin is the models.LyricsOrigin for MusixMatch.
 var MusixMatchOrigin = models.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
 
 type musixMatch struct {
@@ -51,6 +52,7 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		Origin: &MusixMatchOrigin}, nil
 }
 
+// MusixMatchExtractor is the Extractor instance used for MusixMatch
 var MusixMatchExtractor = musixMatch{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`),
 }}

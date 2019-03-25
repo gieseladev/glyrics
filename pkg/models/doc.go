@@ -1,2 +1,2 @@
-// Various utility "models" for gLyrics.
+// Package models contains the models for gLyrics.
 package models

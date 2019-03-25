@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// AnimeLyricsOrigin is the models.LyricsOrigin for AnimeLyrics.
 var AnimeLyricsOrigin = models.LyricsOrigin{Name: "Animelyrics", Url: "animelyrics.com"}
 
 type animeLyrics struct {
@@ -66,6 +67,7 @@ func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics,
 		Origin: &AnimeLyricsOrigin}, nil
 }
 
+// AnimeLyricsExtractor is the Extractor instance used for AnimeLyrics
 var AnimeLyricsExtractor = animeLyrics{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`),
 }}

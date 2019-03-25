@@ -1,5 +1,6 @@
 # gLyrics
 [![GoDoc](https://godoc.org/github.com/gieseladev/glyrics?status.svg)][godoc-link]
+[![Go Report Card](https://goreportcard.com/badge/github.com/gieseladev/glyrics)][go-report-link]
 
 ## Overview
 gLyrics is a library for extracting lyrics from websites. 
@@ -23,3 +24,4 @@ TODO
 [MIT](/LICENSE)
 
 [godoc-link]: https://godoc.org/github.com/gieseladev/glyrics
+[go-report-link]: https://goreportcard.com/report/github.com/gieseladev/glyrics

@@ -1,4 +1,4 @@
-// gLyrics is a library for extracting lyrics from lyrics websites.
+// Package gLyrics is a library for extracting lyrics from lyrics websites.
 // It also comes with a lyrics search function which uses google custom
 // search to provide the most accurate results possible.
 package glyrics

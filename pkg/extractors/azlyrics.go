@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// AZLyricsOrigin is the models.LyricsOrigin for AZLyrics.
 var AZLyricsOrigin = models.LyricsOrigin{Name: "AZLyrics", Url: "azlyrics.com"}
 
 type azLyrics struct {
@@ -41,6 +42,7 @@ func (extractor *azLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, er
 		Origin: &AZLyricsOrigin}, nil
 }
 
+// AZLyricsExtractor is the Extractor instance used for AZLyrics
 var AZLyricsExtractor = azLyrics{RegexCanHandle{
 	UrlMatch: regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.*`),
 }}

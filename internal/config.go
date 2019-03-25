@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// CliConfig
+// CliConfig represents the config used by the command line tool
 type CliConfig struct {
 	GoogleApiKey string `json:"google_api_key"`
 }
@@ -21,6 +21,7 @@ func openConfigFile() (*os.File, error) {
 	return file, err
 }
 
+// SaveConfig saves the config to the config file
 func (config CliConfig) SaveConfig() error {
 	file, err := openConfigFile()
 	defer func() { _ = file.Close() }()
@@ -31,6 +32,7 @@ func (config CliConfig) SaveConfig() error {
 	return json.NewEncoder(file).Encode(config)
 }
 
+// GetConfig loads the CliConfig from the config file
 func GetConfig() (*CliConfig, error) {
 	file, err := openConfigFile()
 	defer func() { _ = file.Close() }()
