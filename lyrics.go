@@ -11,10 +11,7 @@ import (
 type LyricsInfo = extractors.LyricsInfo
 type LyricsOrigin = extractors.LyricsOrigin
 
-// ExtractLyricsFromRequest tries to extract lyrics from
-// the provided Request.
-// It tries all extractors from extractors.Extractors
-// and returns the first one that was successful.
+// ExtractLyricsFromRequest tries to extract lyrics from the provided Request.
 // Errors from extracting lyrics are ignored. The only error
 // returned by this function is when no extractor was able to
 // extract any lyrics.

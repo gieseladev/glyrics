@@ -1,4 +1,6 @@
-// Package registeredExtractors contains the various lyrics registeredExtractors for gLyrics.
+/*
+Package extractors contains the extractors for gLyrics.
+*/
 package extractors
 
 import (

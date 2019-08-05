@@ -1,3 +1,6 @@
+/*
+Package requests provides a request object for accessing websites.
+*/
 package requests
 
 import (
@@ -42,6 +45,7 @@ func (req *Request) Close() {
 	}
 }
 
+// Reset closes the request and removes all cached data.
 func (req *Request) Reset() {
 	req.respMux.Lock()
 	defer req.respMux.Unlock()
@@ -54,6 +58,7 @@ func (req *Request) Reset() {
 	req.document = nil
 }
 
+// Context returns the context of the request.
 func (req *Request) Context() context.Context {
 	if req.ctx == nil {
 		return context.Background()

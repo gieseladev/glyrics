@@ -46,11 +46,25 @@ func TestExtractor(t *testing.T) {
 	}
 }
 
-func TestSearchFirstLyrics(t *testing.T) {
+func getGoogleAPIKey(t *testing.T) string {
 	apiKey := os.Getenv("GOOGLE_API_KEY")
 	if apiKey == "" {
 		t.Fatal("GOOGLE_API_KEY not set!")
 	}
+
+	return apiKey
+}
+
+func TestSearchNLyrics(t *testing.T) {
+	apiKey := getGoogleAPIKey(t)
+	lyrics := SearchNLyrics("Hello World", apiKey, 3)
+	if len(lyrics) > 3 {
+		t.Error("found more than the requested amount of lyrics")
+	}
+}
+
+func TestSearchFirstLyrics(t *testing.T) {
+	apiKey := getGoogleAPIKey(t)
 
 	lyrics := SearchFirstLyrics("I dunno what to lookup anymore", apiKey)
 	if lyrics == nil {
