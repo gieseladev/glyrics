@@ -1,17 +1,22 @@
-package models
+package requests
 
 import (
+	"context"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
 // Request is a wrapper around a url
 // which makes it easy to access the data
 // it points to.
 type Request struct {
-	Url      string
+	Url string
+	ctx context.Context
+
 	request  *http.Request
+	respMux  sync.Mutex
 	response *http.Response
 	text     string
 	document *goquery.Document
@@ -20,7 +25,13 @@ type Request struct {
 // NewRequest creates a new request and initialises it
 // with the provided url.
 func NewRequest(url string) *Request {
-	return &Request{Url: url}
+	return NewRequestWithContext(nil, url)
+}
+
+// NewRequestWithContext creates a new request with the given context.
+// Note that nil is a valid context.
+func NewRequestWithContext(ctx context.Context, url string) *Request {
+	return &Request{Url: url, ctx: ctx}
 }
 
 // Close performs cleanup for the Request.
@@ -31,6 +42,26 @@ func (req *Request) Close() {
 	}
 }
 
+func (req *Request) Reset() {
+	req.respMux.Lock()
+	defer req.respMux.Unlock()
+
+	req.Close()
+
+	req.request = nil
+	req.response = nil
+	req.text = ""
+	req.document = nil
+}
+
+func (req *Request) Context() context.Context {
+	if req.ctx == nil {
+		return context.Background()
+	} else {
+		return req.ctx
+	}
+}
+
 // Request creates an http.Request (GET) for the url
 // and returns it. The request is internally cached
 // so calling this method multiple times will return
@@ -38,14 +69,18 @@ func (req *Request) Close() {
 func (req *Request) Request() *http.Request {
 	if req.request == nil {
 		request, _ := http.NewRequest("GET", req.Url, nil)
-		req.request = request
+		req.request = request.WithContext(req.Context())
 	}
+
 	return req.request
 }
 
 // Response performs the Request.Request and returns the response/error.
 // The Response is internally cached and will be cleaned up by Request.Close.
 func (req *Request) Response() (*http.Response, error) {
+	req.respMux.Lock()
+	defer req.respMux.Unlock()
+
 	if req.response == nil {
 		request := req.Request()
 

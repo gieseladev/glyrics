@@ -1,4 +1,4 @@
-package glyrics
+package search
 
 import (
 	"os"
@@ -23,5 +23,5 @@ func TestGoogleSearch(t *testing.T) {
 		t.Error("Google Search timed out")
 	}
 
-	stop <- true
+	close(stop)
 }

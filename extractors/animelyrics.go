@@ -2,21 +2,17 @@ package extractors
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/requests"
 	"regexp"
 	"strings"
 )
 
-// AnimeLyricsOrigin is the models.LyricsOrigin for AnimeLyrics.
-var AnimeLyricsOrigin = models.LyricsOrigin{Name: "Animelyrics", Url: "animelyrics.com"}
-
-type animeLyrics struct {
-	RegexCanHandle
-}
+// AnimeLyricsOrigin is the lyrics origin for Animelyrics
+var AnimeLyricsOrigin = LyricsOrigin{Name: "Animelyrics", Url: "animelyrics.com"}
 
 var artistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
 
-func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
+func ExtractAnimeLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -63,15 +59,15 @@ func (extractor *animeLyrics) ExtractLyrics(req models.Request) (*models.Lyrics,
 
 	lyrics = strings.TrimSpace(strings.Replace(lyrics, "\u00a0", " ", -1))
 
-	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
-		Origin: &AnimeLyricsOrigin}, nil
+	return &LyricsInfo{Url: req.Url,
+		Title: title, Artist: artist,
+		Lyrics: lyrics,
+		Origin: AnimeLyricsOrigin}, nil
 }
 
-// AnimeLyricsExtractor is the Extractor instance used for AnimeLyrics
-var AnimeLyricsExtractor = animeLyrics{RegexCanHandle{
-	UrlMatch: regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`),
-}}
-
 func init() {
-	RegisterExtractor(&AnimeLyricsExtractor)
+	RegisterExtractor(CreateMaybeExtractor(
+		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`)),
+		ExtractorFunc(ExtractAnimeLyricsLyrics),
+	))
 }

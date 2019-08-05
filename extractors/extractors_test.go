@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"fmt"
-	"github.com/gieseladev/glyrics/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/requests"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
@@ -34,7 +34,7 @@ func (test *lyricsTestCase) ShouldSkip(t *testing.T) bool {
 	return false
 }
 
-func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
+func (test *lyricsTestCase) Test(t *testing.T, lyrics *LyricsInfo) {
 	if test.Title != lyrics.Title {
 		t.Errorf("Title %q didn't match expected: %q", lyrics.Title, test.Title)
 	}
@@ -45,11 +45,11 @@ func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
 		t.Errorf("Date %s didn't match expected: %s", lyrics.ReleaseDate, test.ReleaseDate)
 	}
 	if test.Lyrics != lyrics.Lyrics {
-		t.Errorf("Lyrics didn't match:\n====\n%q\n====\nVS EXPECTED\n====\n%q\n====", lyrics.Lyrics, test.Lyrics)
+		t.Errorf("LyricsInfo didn't match:\n====\n%q\n====\nVS EXPECTED\n====\n%q\n====", lyrics.Lyrics, test.Lyrics)
 	}
 
-	if lyrics.Origin == nil {
-		t.Errorf("Lyrics don't have an origin: %v", lyrics)
+	if lyrics.Origin.Name == "" {
+		t.Errorf("LyricsInfo doesn't have an origin: %v", lyrics)
 	}
 	if test.Extractor != lyrics.Origin.Name {
 		t.Errorf("Origin %q didn't match expected: %q", lyrics.Origin.Name, test.Extractor)
@@ -57,7 +57,7 @@ func (test *lyricsTestCase) Test(t *testing.T, lyrics *models.Lyrics) {
 }
 
 func gatherTestCases(t *testing.T) []lyricsTestCase {
-	pattern := filepath.Join("..", "..", "test", "testdata", "lyrics", "*.yml")
+	pattern := filepath.Join("..", "..", "test", "data", "lyrics", "*.yml")
 	files, err := filepath.Glob(pattern)
 	if err != nil {
 		t.Error(err)
@@ -95,10 +95,10 @@ func getType(myvar interface{}) string {
 	return t.Name()
 }
 
-func findExtractor(name string) Extractor {
+func findExtractor(name string) MaybeExtractor {
 	name = strings.Replace(name, " ", "", -1)
 
-	for _, extractor := range Extractors {
+	for _, extractor := range registeredExtractors {
 		extractorName := getType(extractor)
 		if strings.HasPrefix(strings.ToLower(extractorName), strings.ToLower(name)) {
 			return extractor
@@ -130,9 +130,9 @@ func TestExtractors(t *testing.T) {
 			continue
 		}
 
-		req := models.Request{Url: testCase.Url}
+		req := requests.NewRequest(testCase.Url)
 
-		if !extractor.CanHandle(req) {
+		if !extractor.CanExtract(req) {
 			t.Errorf("ERROR: Extractor %s can't handle url %s", extractor, req.Url)
 		}
 

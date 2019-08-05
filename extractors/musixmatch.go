@@ -3,20 +3,16 @@ package extractors
 import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/requests"
 	"regexp"
 	"strings"
 	"time"
 )
 
-// MusixMatchOrigin is the models.LyricsOrigin for MusixMatch.
-var MusixMatchOrigin = models.LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
+// MusixMatchOrigin is the glyrics.LyricsOrigin for MusixMatch.
+var MusixMatchOrigin = LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
 
-type musixMatch struct {
-	RegexCanHandle
-}
-
-func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
+func ExtractMusixMatchLyrics(req *requests.Request) (*LyricsInfo, error) {
 	req.Request().Header.Set(
 		"user-agent",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
@@ -55,17 +51,15 @@ func (extractor *musixMatch) ExtractLyrics(req models.Request) (*models.Lyrics, 
 		date = time.Time{}
 	}
 
-	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
-		Origin: &MusixMatchOrigin}, nil
+	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
+		Origin: MusixMatchOrigin}, nil
 }
 
-// MusixMatchExtractor is the Extractor instance used for MusixMatch
-var MusixMatchExtractor = musixMatch{RegexCanHandle{
-	UrlMatch: regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`),
-}}
-
 func init() {
-	RegisterExtractor(&MusixMatchExtractor)
+	RegisterExtractor(CreateMaybeExtractor(
+		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`)),
+		ExtractorFunc(ExtractMusixMatchLyrics),
+	))
 }
 
 var dayOrdinals = map[string]string{ // map[ordinal]cardinal

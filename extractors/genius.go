@@ -3,20 +3,16 @@ package extractors
 import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/pkg/models"
+	"github.com/gieseladev/glyrics/pkg/requests"
 	"regexp"
 	"strings"
 	"time"
 )
 
-// GeniusOrigin is the models.LyricsOrigin for Genius.
-var GeniusOrigin = models.LyricsOrigin{Name: "Genius", Url: "genius.com"}
+// GeniusOrigin is the LyricsOrigin for Genius.
+var GeniusOrigin = LyricsOrigin{Name: "Genius", Url: "genius.com"}
 
-type geniusLyrics struct {
-	RegexCanHandle
-}
-
-func (extractor *geniusLyrics) ExtractLyrics(req models.Request) (*models.Lyrics, error) {
+func ExtractGeniusLyrics(req *requests.Request) (*LyricsInfo, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -42,16 +38,14 @@ func (extractor *geniusLyrics) ExtractLyrics(req models.Request) (*models.Lyrics
 		return nil, errors.New("no lyrics found")
 	}
 
-	return &models.Lyrics{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
+	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		ReleaseDate: releaseDate,
-		Origin:      &GeniusOrigin}, nil
+		Origin:      GeniusOrigin}, nil
 }
 
-// GeniusLyricsExtractor is the Extractor instance used for Genius
-var GeniusLyricsExtractor = geniusLyrics{RegexCanHandle{
-	UrlMatch: regexp.MustCompile(`https?://(?:www.)?genius.com/.*`),
-}}
-
 func init() {
-	RegisterExtractor(&GeniusLyricsExtractor)
+	RegisterExtractor(CreateMaybeExtractor(
+		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?genius.com/.*`)),
+		ExtractorFunc(ExtractGeniusLyrics),
+	))
 }

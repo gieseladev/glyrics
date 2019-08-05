@@ -1,10 +1,14 @@
-package glyrics
+package search
 
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	url2 "net/url"
+	"github.com/gieseladev/glyrics/pkg/requests"
+	"net/url"
+)
+
+const (
+	searchAPIURL = "https://www.googleapis.com/customsearch/v1"
 )
 
 type googleCustomSearchResult struct {
@@ -17,26 +21,27 @@ type googleCustomSearchResult struct {
 // optimised for lyrics. It returns a channel which yields all urls of the search
 // results in order and a channel which can be used to stop the search.
 // If not stopped the search channel will yield 100 search results.
-func GoogleSearch(query string, apiKey string) (<-chan string, chan<- bool) {
+func GoogleSearch(query string, apiKey string) (<-chan string, chan<- struct{}) {
 	itemCount := 10
 
-	url := fmt.Sprintf("https://www.googleapis.com/customsearch/v1?"+
-		"q=%s"+
+	searchURL := fmt.Sprintf(searchAPIURL+
+		"?q=%s"+
 		"&key=%s"+
 		"&cx=002017775112634544492:7y5bpl2sn78"+
 		"&fields=items(link)"+
-		"&num=%d&start=%%d", url2.QueryEscape(query), apiKey, itemCount)
+		"&num=%d&start=%%d",
+		url.QueryEscape(query), apiKey, itemCount)
 
 	urlChan := make(chan string, itemCount)
-	stopSignal := make(chan bool, 1)
+	stopSignal := make(chan struct{})
 
 	go func() {
 		defer close(urlChan)
 
 	SearchLoop:
 		for i := 1; i <= 100; i += itemCount {
-			// FIXME http.Get uses http.DefaultClient which doesn't have any timeout
-			resp, err := http.Get(fmt.Sprintf(url, i))
+			req := requests.NewRequest(fmt.Sprintf(searchURL, i))
+			resp, err := req.Response()
 			if err != nil {
 				panic(err)
 			}

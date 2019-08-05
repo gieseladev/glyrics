@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gieseladev/glyrics/internal"
-	"github.com/gieseladev/glyrics/pkg"
-	"github.com/gieseladev/glyrics/pkg/models"
+	"github.com/gieseladev/glyrics"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -12,7 +10,7 @@ import (
 	"time"
 )
 
-func printLyrics(lyrics *models.Lyrics) {
+func printLyrics(lyrics *glyrics.LyricsInfo) {
 	headlineBuilder := strings.Builder{}
 	headlineBuilder.WriteString(lyrics.Title)
 	if lyrics.Artist != "" {
@@ -36,7 +34,7 @@ func searchLyrics(c *cli.Context) {
 	query := strings.Join(c.Args(), " ")
 	apiKey := c.String("token")
 
-	config, err := internal.GetConfig()
+	config, err := GetConfig()
 	if apiKey == "" {
 		if err != nil {
 			log.Fatal("No token passed and couldn't load config file: ", err)
@@ -47,13 +45,13 @@ func searchLyrics(c *cli.Context) {
 		config.GoogleApiKey = apiKey
 		_ = config.SaveConfig()
 	} else {
-		_ = internal.CliConfig{GoogleApiKey: apiKey}.SaveConfig()
+		_ = CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
 	lyrics := glyrics.SearchFirstLyrics(query, apiKey)
 
-	if lyrics != (models.Lyrics{}) {
-		printLyrics(&lyrics)
+	if lyrics != nil {
+		printLyrics(lyrics)
 	} else {
 		log.Fatal("Couldn't find any results!")
 	}
