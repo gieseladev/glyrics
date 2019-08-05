@@ -34,7 +34,7 @@ func (test *lyricsTestCase) ShouldSkip(t *testing.T) bool {
 	return false
 }
 
-func (test *lyricsTestCase) Test(t *testing.T, lyrics *LyricsInfo) {
+func (test *lyricsTestCase) Check(t *testing.T, lyrics *LyricsInfo) {
 	if test.Title != lyrics.Title {
 		t.Errorf("Title %q didn't match expected: %q", lyrics.Title, test.Title)
 	}
@@ -54,6 +54,39 @@ func (test *lyricsTestCase) Test(t *testing.T, lyrics *LyricsInfo) {
 	if test.Extractor != lyrics.Origin.Name {
 		t.Errorf("Origin %q didn't match expected: %q", lyrics.Origin.Name, test.Extractor)
 	}
+}
+
+func (test *lyricsTestCase) Test(t *testing.T) {
+	if test == nil {
+		t.Error("Empty test case, skipping!")
+		return
+	}
+
+	t.Log(test.String())
+	if test.ShouldSkip(t) {
+		t.Log("> Skipped")
+		return
+	}
+
+	extractor := findExtractor(test.Extractor)
+	if extractor == nil {
+		t.Error("ERROR: Couldn't find extractor")
+		return
+	}
+
+	req := requests.NewRequest(test.Url)
+
+	if !extractor.CanExtract(req) {
+		t.Errorf("ERROR: Extractor %s can't handle url %s", extractor, req.Url)
+	}
+
+	lyrics, err := extractor.ExtractLyrics(req)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	test.Check(t, lyrics)
 }
 
 func gatherTestCases(t *testing.T) []lyricsTestCase {
@@ -113,35 +146,6 @@ func TestExtractors(t *testing.T) {
 	t.Logf("Testing %d case(s)", len(cases))
 
 	for _, testCase := range cases {
-		if testCase == (lyricsTestCase{}) {
-			t.Error("Empty test case, skipping!")
-			continue
-		}
-
-		t.Log(testCase.String())
-		if testCase.ShouldSkip(t) {
-			t.Log("> Skipped")
-			continue
-		}
-
-		extractor := findExtractor(testCase.Extractor)
-		if extractor == nil {
-			t.Error("ERROR: Couldn't find extractor")
-			continue
-		}
-
-		req := requests.NewRequest(testCase.Url)
-
-		if !extractor.CanExtract(req) {
-			t.Errorf("ERROR: Extractor %s can't handle url %s", extractor, req.Url)
-		}
-
-		lyrics, err := extractor.ExtractLyrics(req)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		testCase.Test(t, lyrics)
+		t.Run(testCase.String(), testCase.Test)
 	}
 }
