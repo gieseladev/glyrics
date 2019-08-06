@@ -10,4 +10,7 @@ workflow "run tests weekly" {
 
 action "run tests" {
   uses = "cedrickring/golang-action@1.3.0"
+  secrets = [
+    "GOOGLE_API_KEY"
+  ]
 }
