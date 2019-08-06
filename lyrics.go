@@ -2,9 +2,9 @@ package glyrics
 
 import (
 	"fmt"
-	"github.com/gieseladev/glyrics/extractors"
-	"github.com/gieseladev/glyrics/pkg/requests"
-	"github.com/gieseladev/glyrics/pkg/search"
+	"github.com/gieseladev/glyrics/v3/extractors"
+	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/search"
 	"sync"
 )
 

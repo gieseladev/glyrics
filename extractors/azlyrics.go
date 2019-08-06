@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"errors"
-	"github.com/gieseladev/glyrics/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/requests"
 	"regexp"
 	"strings"
 )

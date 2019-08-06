@@ -3,7 +3,7 @@ package search
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gieseladev/glyrics/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/requests"
 	"net/url"
 )
 

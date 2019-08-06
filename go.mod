@@ -1,4 +1,4 @@
-module github.com/gieseladev/glyrics
+module github.com/gieseladev/glyrics/v3
 
 go 1.12
 

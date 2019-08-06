@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gieseladev/glyrics"
+	"github.com/gieseladev/glyrics/v3"
 	"github.com/urfave/cli"
 	"log"
 	"os"

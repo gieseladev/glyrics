@@ -2,7 +2,7 @@ package extractors
 
 import (
 	"fmt"
-	"github.com/gieseladev/glyrics/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/requests"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"

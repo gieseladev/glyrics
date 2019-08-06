@@ -4,7 +4,7 @@ Package extractors contains the extractors for gLyrics.
 package extractors
 
 import (
-	"github.com/gieseladev/glyrics/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/requests"
 	"regexp"
 	"sync"
 	"time"

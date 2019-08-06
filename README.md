@@ -1,7 +1,7 @@
 # gLyrics
 
-[![GoDoc](https://godoc.org/github.com/gieseladev/glyrics?status.svg)][godoc-link]
-[![Go Report Card](https://goreportcard.com/badge/github.com/gieseladev/glyrics)][go-report-link]
+[![GoDoc](https://godoc.org/github.com/gieseladev/glyrics/v3?status.svg)][godoc-link]
+[![Go Report Card](https://goreportcard.com/badge/github.com/gieseladev/glyrics/v3)][go-report-link]
 
 ## Overview
 
@@ -15,7 +15,7 @@ gLyrics API to show lyrics.
 ## Installation
 
 ```bash
-go get github.com/gieseladev/glyrics
+go get github.com/gieseladev/glyrics/v3
 ```
 
 ## Command Line Tool
@@ -26,5 +26,5 @@ TODO
 
 [MIT](/LICENSE)
 
-[godoc-link]: https://godoc.org/github.com/gieseladev/glyrics
-[go-report-link]: https://goreportcard.com/report/github.com/gieseladev/glyrics
+[godoc-link]: https://godoc.org/github.com/gieseladev/glyrics/v3
+[go-report-link]: https://goreportcard.com/report/github.com/gieseladev/glyrics/v3
