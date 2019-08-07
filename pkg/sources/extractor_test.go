@@ -74,10 +74,10 @@ func (test *lyricsTestCase) Test(t *testing.T) {
 	r.Len(extractors, 1, "must return exactly one extractor")
 	extractor := extractors[0]
 
-	lyrics, err := extractor.ExtractLyrics(req)
+	info, err := extractor.ExtractLyrics(req)
 	r.NoError(err, "extractor returned error")
 
-	test.Check(t, lyrics)
+	test.Check(t, info)
 }
 
 func gatherTestCases(t *testing.T) []lyricsTestCase {
