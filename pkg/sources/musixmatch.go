@@ -57,7 +57,7 @@ func extractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
 		date = time.Time{}
 	}
 
-	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyricsText,
 		Origin: MusixMatchOrigin}, nil
 }
 

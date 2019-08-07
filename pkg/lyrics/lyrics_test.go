@@ -10,7 +10,7 @@ import (
 
 func TestLyrics_MarshalJSON(t *testing.T) {
 	releaseDate := time.Now()
-	lyrics := Info{Url: "Website", Title: "Title", Artist: "Artist", Lyrics: "LyricsInfo",
+	lyrics := Info{URL: "Website", Title: "Title", Artist: "Artist", Lyrics: "LyricsInfo",
 		ReleaseDate: releaseDate,
 		Origin:      Origin{Name: "SourceName", Website: "SourceURL"},
 	}

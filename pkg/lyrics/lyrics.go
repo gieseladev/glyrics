@@ -13,7 +13,7 @@ type Origin struct {
 
 // Info represents a song's lyrics and metadata.
 type Info struct {
-	Url         string    `json:"url"`
+	URL         string    `json:"url"`
 	Title       string    `json:"title"`
 	Artist      string    `json:"artist"`
 	Lyrics      string    `json:"lyrics"`

@@ -10,6 +10,8 @@ import (
 	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"github.com/gieseladev/glyrics/v3/pkg/search"
 	"github.com/gieseladev/glyrics/v3/pkg/sources"
+	"golang.org/x/sync/semaphore"
+	"sync"
 )
 
 // LyricsInfo is an alias for lyrics.Info
@@ -35,7 +37,7 @@ func ExtractFromRequest(req *request.Request) (*LyricsInfo, error) {
 		return info, nil
 	}
 
-	return nil, fmt.Errorf("no extractor could extract from %s", req.Url)
+	return nil, fmt.Errorf("no extractor could extract from %s", req.URL)
 }
 
 // ExtractWithContext extracts the lyrics from the url using the context.
@@ -49,26 +51,100 @@ func Extract(url string) (*LyricsInfo, error) {
 	return ExtractWithContext(context.Background(), url)
 }
 
+type workerCountKey struct{}
+
+// WithWorkers sets the amount of workers to use for Search.
+// The default is 3.
+func WithWorkers(ctx context.Context, workers int64) context.Context {
+	return context.WithValue(ctx, workerCountKey{}, workers)
+}
+
 // Search uses the searcher to search for lyrics based on the
 // query. It returns a channel which sends lyrics infos. To stop sending, cancel
 // the context.
 func Search(ctx context.Context, searcher search.Searcher, query string) <-chan *LyricsInfo {
-	lyricsChan := make(chan *LyricsInfo)
+	infos := make(chan *LyricsInfo)
 	results := searcher.Search(ctx, query)
 
-	go func() {
-		defer close(lyricsChan)
+	workers, ok := ctx.Value(workerCountKey{}).(int64)
+	if !ok {
+		workers = 3
+	}
 
+	sem := semaphore.NewWeighted(workers)
+
+	type lyricsWithIndex struct {
+		Index int
+		Info  *LyricsInfo
+	}
+
+	unorderedLyrics := make(chan lyricsWithIndex)
+
+	// Uses `workers` amount of goroutines to perform extractions. As the
+	// results come in unordered, they aren't returned directly. Instead,
+	// another goroutine handles the
+	go func() {
+		defer close(unorderedLyrics)
+
+		var wg sync.WaitGroup
+
+		index := 0
 		for result := range results {
-			req := request.NewWithContext(ctx, result.URL)
-			info, err := ExtractFromRequest(req)
-			if err == nil {
-				lyricsChan <- info
+			if err := sem.Acquire(ctx, 1); err != nil {
+				break
+			}
+
+			wg.Add(1)
+			go func(index int, result search.Result) {
+				defer sem.Release(1)
+				defer wg.Done()
+
+				req := request.NewWithContext(ctx, result.URL)
+				info, _ := ExtractFromRequest(req)
+				unorderedLyrics <- lyricsWithIndex{Index: index, Info: info}
+			}(index, result)
+
+			index++
+		}
+
+		wg.Wait()
+	}()
+
+	// receives the unordered results from the extraction and buffers them
+	// to return them in order.
+	go func() {
+		defer close(infos)
+
+		buf := make(map[int]*LyricsInfo)
+		index := 0
+
+		for result := range unorderedLyrics {
+			if result.Index != index {
+				buf[result.Index] = result.Info
+				continue
+			}
+
+			if info := result.Info; info != nil {
+				infos <- info
+			}
+			index++
+
+			for ; ; index++ {
+				info, ok := buf[index]
+				if !ok {
+					break
+				}
+				delete(buf, index)
+
+				if info != nil {
+					infos <- info
+				}
+
 			}
 		}
 	}()
 
-	return lyricsChan
+	return infos
 }
 
 // SearchN returns a slice with at most amount lyrics infos in it.
@@ -77,6 +153,9 @@ func SearchN(ctx context.Context, searcher search.Searcher,
 	infos := make([]LyricsInfo, 0, amount)
 
 	ctx, cancel := context.WithCancel(ctx)
+	if amount < 10 {
+		ctx = WithWorkers(ctx, int64(amount))
+	}
 	lyricsChan := Search(ctx, searcher, query)
 
 	for len(infos) < amount {
@@ -97,6 +176,7 @@ func SearchN(ctx context.Context, searcher search.Searcher,
 // Might return nil if the context is cancelled or no results are found.
 func SearchFirst(ctx context.Context, searcher search.Searcher, query string) *LyricsInfo {
 	ctx, cancel := context.WithCancel(ctx)
+	ctx = WithWorkers(ctx, 1)
 	lyricsChan := Search(ctx, searcher, query)
 
 	info := <-lyricsChan

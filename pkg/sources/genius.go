@@ -44,7 +44,7 @@ func extractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
 		return nil, errors.New("no lyrics found")
 	}
 
-	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
 		ReleaseDate: releaseDate,
 		Origin:      GeniusOrigin}, nil
 }

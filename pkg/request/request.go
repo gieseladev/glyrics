@@ -15,7 +15,7 @@ import (
 // which makes it easy to access the data
 // it points to.
 type Request struct {
-	Url string
+	URL string
 	ctx context.Context
 
 	request  *http.Request
@@ -34,7 +34,7 @@ func New(url string) *Request {
 // NewWithContext creates a new request with the given context.
 // Note that nil is a valid context.
 func NewWithContext(ctx context.Context, url string) *Request {
-	return &Request{Url: url, ctx: ctx}
+	return &Request{URL: url, ctx: ctx}
 }
 
 // Close performs cleanup for the Request.
@@ -73,7 +73,7 @@ func (req *Request) Context() context.Context {
 // the same http.Request.
 func (req *Request) Request() *http.Request {
 	if req.request == nil {
-		request, _ := http.NewRequest("GET", req.Url, nil)
+		request, _ := http.NewRequest("GET", req.URL, nil)
 		req.request = request.WithContext(req.Context())
 	}
 

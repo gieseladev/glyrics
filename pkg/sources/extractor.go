@@ -94,5 +94,5 @@ func RegexExtractorTeller(re *regexp.Regexp) CanExtractTeller {
 }
 
 func (e *regexExtractorTeller) CanExtract(req *request.Request) bool {
-	return e.MatchString(req.Url)
+	return e.MatchString(req.URL)
 }

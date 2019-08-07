@@ -66,13 +66,13 @@ func extractAZLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(center.Find("div:not([class])").First().Text())
 
-	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: AZLyricsOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.*`)),
+		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.+`)),
 		AZLyricsExtractor,
 	))
 }

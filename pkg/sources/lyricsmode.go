@@ -40,7 +40,7 @@ func extractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(lyricsContainer.Text())
 
-	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: LyricsModeOrigin}, nil
 }
 

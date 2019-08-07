@@ -54,7 +54,7 @@ func extractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(lyricsBuilder.String())
 
-	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: LyricalNonsenseOrigin}, nil
 }
 

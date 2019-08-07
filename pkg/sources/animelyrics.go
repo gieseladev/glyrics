@@ -65,7 +65,7 @@ func extractAnimeLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText = strings.TrimSpace(strings.Replace(lyricsText, "\u00a0", " ", -1))
 
-	return &lyrics.Info{Url: req.Url,
+	return &lyrics.Info{URL: req.URL,
 		Title: title, Artist: artist,
 		Lyrics: lyricsText,
 		Origin: AnimeLyricsOrigin}, nil

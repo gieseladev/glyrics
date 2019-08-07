@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gieseladev/glyrics/v3/pkg/request"
-	"log"
 	"net/url"
 )
 
@@ -53,7 +52,6 @@ func (s *Google) Search(ctx context.Context, query string) <-chan Result {
 			req := request.NewWithContext(ctx, fmt.Sprintf(searchURL, i))
 			resp, err := req.Response()
 			if err != nil {
-				log.Print(err)
 				return
 			}
 
