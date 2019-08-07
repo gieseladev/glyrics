@@ -14,9 +14,10 @@ const (
 	googleSearchAPIURL = "https://www.googleapis.com/customsearch/v1"
 )
 
-type GoogleSearcher struct {
-	APIKey string
-	CX     string
+// Google implements Searcher for Google custom search engines.
+type Google struct {
+	APIKey string // api key enabled for the custom search api
+	CX     string // custom search engine id. If empty a default is used.
 }
 
 type googleCustomSearchResult struct {
@@ -25,7 +26,9 @@ type googleCustomSearchResult struct {
 	} `json:"items"`
 }
 
-func (s *GoogleSearcher) Search(ctx context.Context, query string) <-chan Result {
+// Search implements Searcher for google.
+// At most 100 results can be returned (limit by Google).
+func (s *Google) Search(ctx context.Context, query string) <-chan Result {
 	const itemCount = 10
 
 	cx := s.CX

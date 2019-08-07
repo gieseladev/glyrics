@@ -49,7 +49,7 @@ func Extract(url string) (*LyricsInfo, error) {
 	return ExtractWithContext(context.Background(), url)
 }
 
-// SearchLyricsWithContext uses the searcher to search for lyrics based on the
+// Search uses the searcher to search for lyrics based on the
 // query. It returns a channel which sends lyrics infos. To stop sending, cancel
 // the context.
 func Search(ctx context.Context, searcher search.Searcher, query string) <-chan *LyricsInfo {

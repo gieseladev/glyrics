@@ -77,6 +77,8 @@ func CreateMaybeExtractor(teller CanExtractTeller, extractor Extractor) MaybeExt
 // ExtractorFunc is a function which implements the Extractor interface.
 type ExtractorFunc func(req *request.Request) (*lyrics.Info, error)
 
+// ExtractLyrics implements Extractor for extractor functions.
+// It acts as an alias for the function itself.
 func (e ExtractorFunc) ExtractLyrics(req *request.Request) (*lyrics.Info, error) {
 	return e(req)
 }

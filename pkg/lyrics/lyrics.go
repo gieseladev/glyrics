@@ -1,3 +1,6 @@
+/*
+Package lyrics provides the lyrics information and origin models.
+*/
 package lyrics
 
 import "time"

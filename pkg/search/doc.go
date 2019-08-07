@@ -1,4 +1,4 @@
 /*
-Package search allows interacting with search engines.
+Package search provides search engines using a common interface.
 */
 package search

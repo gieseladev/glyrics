@@ -14,7 +14,7 @@ func getGoogleSearcher(t *testing.T) search.Searcher {
 		t.Fatal("GOOGLE_API_KEY not set!")
 	}
 
-	return &search.GoogleSearcher{APIKey: apiKey}
+	return &search.Google{APIKey: apiKey}
 }
 
 func TestSearchN(t *testing.T) {

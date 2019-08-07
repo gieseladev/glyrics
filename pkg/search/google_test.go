@@ -13,7 +13,7 @@ func TestGoogleSearcher(t *testing.T) {
 		t.Fatal("GOOGLE_API_KEY not set!")
 	}
 
-	searcher := GoogleSearcher{APIKey: apiKey}
+	searcher := Google{APIKey: apiKey}
 	results := searcher.Search(context.Background(), "test")
 
 	select {

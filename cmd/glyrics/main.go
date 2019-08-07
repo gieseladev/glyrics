@@ -51,7 +51,7 @@ func searchLyrics(c *cli.Context) {
 		_ = CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
-	searcher := &search.GoogleSearcher{APIKey: apiKey}
+	searcher := &search.Google{APIKey: apiKey}
 	lyrics := glyrics.SearchFirst(context.Background(), searcher, query)
 
 	if lyrics != nil {
