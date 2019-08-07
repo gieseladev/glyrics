@@ -2,16 +2,21 @@ package sources
 
 import (
 	"errors"
-	lyrics2 "github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
 	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 )
 
-// AZLyricsOrigin is the lyrics origin for AZLyrics.
-var AZLyricsOrigin = lyrics2.Origin{Name: "AZLyrics", Website: "azlyrics.com"}
+var (
+	// AZLyricsOrigin is the lyrics origin for AZLyrics.
+	AZLyricsOrigin = lyrics.Origin{Name: "AZLyrics", Website: "azlyrics.com"}
 
-func ExtractAZLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
+	// AZLyricsExtractor is an extractor for AZLyrics
+	AZLyricsExtractor = ExtractorFunc(extractAZLyricsLyrics)
+)
+
+func extractAZLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 	const (
 		// format: `"<title>" lyrics`
 		titlePrefixLen = len(`"`)
@@ -59,15 +64,15 @@ func ExtractAZLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
 		artist = ""
 	}
 
-	lyrics := strings.TrimSpace(center.Find("div:not([class])").First().Text())
+	lyricsText := strings.TrimSpace(center.Find("div:not([class])").First().Text())
 
-	return &lyrics2.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
+	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: AZLyricsOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.*`)),
-		ExtractorFunc(ExtractAZLyricsLyrics),
+		AZLyricsExtractor,
 	))
 }

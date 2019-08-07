@@ -62,9 +62,9 @@ func (req *Request) Reset() {
 func (req *Request) Context() context.Context {
 	if req.ctx == nil {
 		return context.Background()
-	} else {
-		return req.ctx
 	}
+
+	return req.ctx
 }
 
 // Request creates an http.Request (GET) for the url

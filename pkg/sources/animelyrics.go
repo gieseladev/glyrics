@@ -2,24 +2,29 @@ package sources
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	lyrics2 "github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
 	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 )
 
-// AnimeLyricsOrigin is the lyrics origin for Animelyrics
-var AnimeLyricsOrigin = lyrics2.Origin{Name: "Animelyrics", Website: "animelyrics.com"}
+var (
+	// AnimeLyricsOrigin is the lyrics origin for Animelyrics
+	AnimeLyricsOrigin = lyrics.Origin{Name: "Animelyrics", Website: "animelyrics.com"}
+
+	// AnimeLyricsExtractor is an extractor for Animelyrics
+	AnimeLyricsExtractor = ExtractorFunc(extractAnimeLyricsLyrics)
+)
 
 var animeLyricsArtistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
 
-func ExtractAnimeLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
+func extractAnimeLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
 	}
 
-	var artist, lyrics string
+	var artist, lyricsText string
 
 	title := strings.TrimSpace(doc.Find("div~h1").First().Contents().First().Text())
 
@@ -34,7 +39,7 @@ func ExtractAnimeLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
 	if window := doc.Find(`table[cellspacing="0"][border="0"]`); window.Length() > 0 {
 		window.Find("dt").Remove()
 		window.Find("span").AfterHtml("\n\n")
-		lyrics = window.Find("td.romaji").Text()
+		lyricsText = window.Find("td.romaji").Text()
 	} else {
 		center := doc.Find("div.centerbox")
 		passedDt := false
@@ -55,20 +60,20 @@ func ExtractAnimeLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
 			return true
 		})
 
-		lyrics = lyricsBuilder.String()
+		lyricsText = lyricsBuilder.String()
 	}
 
-	lyrics = strings.TrimSpace(strings.Replace(lyrics, "\u00a0", " ", -1))
+	lyricsText = strings.TrimSpace(strings.Replace(lyricsText, "\u00a0", " ", -1))
 
-	return &lyrics2.Info{Url: req.Url,
+	return &lyrics.Info{Url: req.Url,
 		Title: title, Artist: artist,
-		Lyrics: lyrics,
+		Lyrics: lyricsText,
 		Origin: AnimeLyricsOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`)),
-		ExtractorFunc(ExtractAnimeLyricsLyrics),
+		AnimeLyricsExtractor,
 	))
 }

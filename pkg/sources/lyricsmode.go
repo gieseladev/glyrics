@@ -8,12 +8,17 @@ import (
 	"strings"
 )
 
-// LyricsModeOrigin is the glyrics.Origin for LyricsMode.
-var LyricsModeOrigin = lyrics.Origin{Name: "LyricsMode", Website: "lyricsmode.com"}
+var (
+	// LyricsModeOrigin is the glyrics.Origin for LyricsMode.
+	LyricsModeOrigin = lyrics.Origin{Name: "LyricsMode", Website: "lyricsmode.com"}
+
+	// LyricsModeExtractor is an extractor for LyricsMode
+	LyricsModeExtractor = ExtractorFunc(extractLyricsModeLyrics)
+)
 
 var lyricsModeHeaderMatcher = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
 
-func ExtractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -42,6 +47,6 @@ func ExtractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?lyricsmode.com/.*`)),
-		ExtractorFunc(ExtractLyricsModeLyrics),
+		LyricsModeExtractor,
 	))
 }

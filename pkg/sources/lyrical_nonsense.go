@@ -9,10 +9,15 @@ import (
 	"strings"
 )
 
-// LyricalNonsenseOrigin is the lyrics origin for Lyrical Nonsense.
-var LyricalNonsenseOrigin = lyrics.Origin{Name: "Lyrical Nonsense", Website: "lyrical-nonsense.com"}
+var (
+	// LyricalNonsenseOrigin is the lyrics origin for Lyrical Nonsense.
+	LyricalNonsenseOrigin = lyrics.Origin{Name: "Lyrical Nonsense", Website: "lyrical-nonsense.com"}
 
-func ExtractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
+	// LyricalNonsenseExtractor is an extractor for Lyrical Nonsense
+	LyricalNonsenseExtractor = ExtractorFunc(extractLyricalNonsenseLyrics)
+)
+
+func extractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
 	const (
 		titleSuffixLen = len(` 歌詞`)
 		titleMinLen    = titleSuffixLen
@@ -56,6 +61,6 @@ func ExtractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?lyrical-nonsense.com/lyrics/.*`)),
-		ExtractorFunc(ExtractLyricalNonsenseLyrics),
+		LyricalNonsenseExtractor,
 	))
 }

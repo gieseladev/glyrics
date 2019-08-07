@@ -10,10 +10,15 @@ import (
 	"time"
 )
 
-// GeniusOrigin is the Origin for Genius.
-var GeniusOrigin = lyrics.Origin{Name: "Genius", Website: "genius.com"}
+var (
+	// GeniusOrigin is the Origin for Genius.
+	GeniusOrigin = lyrics.Origin{Name: "Genius", Website: "genius.com"}
 
-func ExtractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
+	// GeniusExtractor is an extractor for Genius
+	GeniusExtractor = ExtractorFunc(extractGeniusLyrics)
+)
+
+func extractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -47,6 +52,6 @@ func ExtractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?genius.com/.*`)),
-		ExtractorFunc(ExtractGeniusLyrics),
+		GeniusExtractor,
 	))
 }

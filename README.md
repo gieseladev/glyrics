@@ -25,5 +25,5 @@ go get github.com/gieseladev/glyrics/v3
 
 TODO
 
-[godoc-link]: https://godoc.org/github.com/gopkg.in/gieseladev/glyrics.v3
+[godoc-link]: https://godoc.org/gopkg.in/gieseladev/glyrics.v3
 [go-report-link]: https://goreportcard.com/report/gopkg.in/gieseladev/glyrics.v3

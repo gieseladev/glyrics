@@ -10,10 +10,15 @@ import (
 	"time"
 )
 
-// MusixMatchOrigin is the glyrics.Origin for MusixMatch.
-var MusixMatchOrigin = lyrics.Origin{Name: "MusixMatch", Website: "musixmatch.com"}
+var (
+	// MusixMatchOrigin is the lyrics origin for MusixMatch.
+	MusixMatchOrigin = lyrics.Origin{Name: "MusixMatch", Website: "musixmatch.com"}
 
-func ExtractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
+	// MusixMatchExtractor is an extractor for MusixMatch
+	MusixMatchExtractor = ExtractorFunc(extractMusixMatchLyrics)
+)
+
+func extractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
 	req.Request().Header.Set(
 		"user-agent",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
@@ -59,7 +64,7 @@ func ExtractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
 		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`)),
-		ExtractorFunc(ExtractMusixMatchLyrics),
+		MusixMatchExtractor,
 	))
 }
 
