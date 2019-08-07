@@ -1,18 +1,19 @@
-package extractors
+package sources
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	lyrics2 "github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 )
 
 // AnimeLyricsOrigin is the lyrics origin for Animelyrics
-var AnimeLyricsOrigin = LyricsOrigin{Name: "Animelyrics", Url: "animelyrics.com"}
+var AnimeLyricsOrigin = lyrics2.Origin{Name: "Animelyrics", Website: "animelyrics.com"}
 
-var artistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
+var animeLyricsArtistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
 
-func ExtractAnimeLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
+func ExtractAnimeLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -25,7 +26,7 @@ func ExtractAnimeLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
 	artistSearchDoc := doc.Clone()
 	artistSearchDoc.Find("br").ReplaceWithHtml("\n")
 
-	artistMatch := artistMatcher.FindStringSubmatch(artistSearchDoc.Text())
+	artistMatch := animeLyricsArtistMatcher.FindStringSubmatch(artistSearchDoc.Text())
 	if len(artistMatch) > 1 {
 		artist = artistMatch[1]
 	}
@@ -59,7 +60,7 @@ func ExtractAnimeLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
 
 	lyrics = strings.TrimSpace(strings.Replace(lyrics, "\u00a0", " ", -1))
 
-	return &LyricsInfo{Url: req.Url,
+	return &lyrics2.Info{Url: req.Url,
 		Title: title, Artist: artist,
 		Lyrics: lyrics,
 		Origin: AnimeLyricsOrigin}, nil

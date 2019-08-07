@@ -1,11 +1,11 @@
-package requests
+package request
 
 import (
 	"testing"
 )
 
 func TestRequest_Response(t *testing.T) {
-	request := NewRequest("https://www.google.com/")
+	request := New("https://www.google.com/")
 	defer request.Close()
 
 	resp, err := request.Response()
@@ -19,7 +19,7 @@ func TestRequest_Response(t *testing.T) {
 }
 
 func TestRequest_Text(t *testing.T) {
-	request := NewRequest("https://httpbin.org/base64/VGVzdA==")
+	request := New("https://httpbin.org/base64/VGVzdA==")
 	defer request.Close()
 
 	text, err := request.Text()
@@ -33,7 +33,7 @@ func TestRequest_Text(t *testing.T) {
 }
 
 func TestRequest_Document(t *testing.T) {
-	request := NewRequest("https://www.google.com/")
+	request := New("https://www.google.com/")
 	defer request.Close()
 
 	document, err := request.Document()

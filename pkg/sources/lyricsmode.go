@@ -1,18 +1,19 @@
-package extractors
+package sources
 
 import (
 	"errors"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 )
 
-// LyricsModeOrigin is the glyrics.LyricsOrigin for LyricsMode.
-var LyricsModeOrigin = LyricsOrigin{Name: "LyricsMode", Url: "lyricsmode.com"}
+// LyricsModeOrigin is the glyrics.Origin for LyricsMode.
+var LyricsModeOrigin = lyrics.Origin{Name: "LyricsMode", Website: "lyricsmode.com"}
 
-var artistTitleSplit = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
+var lyricsModeHeaderMatcher = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
 
-func ExtractLyricsModeLyrics(req *requests.Request) (*LyricsInfo, error) {
+func ExtractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -21,7 +22,7 @@ func ExtractLyricsModeLyrics(req *requests.Request) (*LyricsInfo, error) {
 	header := doc.Find("h1.song_name.fs32").Text()
 
 	var artist, title string
-	match := artistTitleSplit.FindStringSubmatch(header)
+	match := lyricsModeHeaderMatcher.FindStringSubmatch(header)
 	if len(match) >= 2 {
 		artist = match[1]
 		title = match[2]
@@ -32,9 +33,9 @@ func ExtractLyricsModeLyrics(req *requests.Request) (*LyricsInfo, error) {
 	lyricsContainer := doc.Find("#lyrics_text").First()
 	lyricsContainer.Children().RemoveFiltered("div.hide")
 
-	lyrics := strings.TrimSpace(lyricsContainer.Text())
+	lyricsText := strings.TrimSpace(lyricsContainer.Text())
 
-	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
+	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: LyricsModeOrigin}, nil
 }
 

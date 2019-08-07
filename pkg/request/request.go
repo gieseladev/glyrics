@@ -1,7 +1,7 @@
 /*
-Package requests provides a request object for accessing websites.
+Package request provides a request object for accessing websites.
 */
-package requests
+package request
 
 import (
 	"context"
@@ -25,15 +25,15 @@ type Request struct {
 	document *goquery.Document
 }
 
-// NewRequest creates a new request and initialises it
+// New creates a new request and initialises it
 // with the provided url.
-func NewRequest(url string) *Request {
-	return NewRequestWithContext(nil, url)
+func New(url string) *Request {
+	return NewWithContext(nil, url)
 }
 
-// NewRequestWithContext creates a new request with the given context.
+// NewWithContext creates a new request with the given context.
 // Note that nil is a valid context.
-func NewRequestWithContext(ctx context.Context, url string) *Request {
+func NewWithContext(ctx context.Context, url string) *Request {
 	return &Request{Url: url, ctx: ctx}
 }
 

@@ -1,15 +1,23 @@
 package search
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
+	"log"
 	"net/url"
 )
 
 const (
-	searchAPIURL = "https://www.googleapis.com/customsearch/v1"
+	googleDefaultCX    = "002017775112634544492:7y5bpl2sn78"
+	googleSearchAPIURL = "https://www.googleapis.com/customsearch/v1"
 )
+
+type GoogleSearcher struct {
+	APIKey string
+	CX     string
+}
 
 type googleCustomSearchResult struct {
 	Items []*struct {
@@ -17,33 +25,33 @@ type googleCustomSearchResult struct {
 	} `json:"items"`
 }
 
-// GoogleSearch performs a google custom search with a search engine strongly
-// optimised for lyrics. It returns a channel which yields all urls of the search
-// results in order and a channel which can be used to stop the search.
-// If not stopped the search channel will yield 100 search results.
-func GoogleSearch(query string, apiKey string) (<-chan string, chan<- struct{}) {
-	itemCount := 10
+func (s *GoogleSearcher) Search(ctx context.Context, query string) <-chan Result {
+	const itemCount = 10
 
-	searchURL := fmt.Sprintf(searchAPIURL+
+	cx := s.CX
+	if cx == "" {
+		cx = googleDefaultCX
+	}
+
+	searchURL := fmt.Sprintf(googleSearchAPIURL+
 		"?q=%s"+
 		"&key=%s"+
-		"&cx=002017775112634544492:7y5bpl2sn78"+
+		"&cx=%s"+
 		"&fields=items(link)"+
 		"&num=%d&start=%%d",
-		url.QueryEscape(query), apiKey, itemCount)
+		url.QueryEscape(query), s.APIKey, cx, itemCount)
 
-	urlChan := make(chan string, itemCount)
-	stopSignal := make(chan struct{})
+	urlChan := make(chan Result, itemCount)
 
 	go func() {
 		defer close(urlChan)
 
-	SearchLoop:
 		for i := 1; i <= 100; i += itemCount {
-			req := requests.NewRequest(fmt.Sprintf(searchURL, i))
+			req := request.NewWithContext(ctx, fmt.Sprintf(searchURL, i))
 			resp, err := req.Response()
 			if err != nil {
-				panic(err)
+				log.Print(err)
+				return
 			}
 
 			var data googleCustomSearchResult
@@ -52,7 +60,7 @@ func GoogleSearch(query string, apiKey string) (<-chan string, chan<- struct{}) 
 			_ = resp.Body.Close()
 
 			if err != nil {
-				break SearchLoop
+				return
 			}
 
 			for _, item := range data.Items {
@@ -61,13 +69,13 @@ func GoogleSearch(query string, apiKey string) (<-chan string, chan<- struct{}) 
 				}
 
 				select {
-				case <-stopSignal:
-					break SearchLoop
-				case urlChan <- item.Link:
+				case <-ctx.Done():
+					return
+				case urlChan <- Result{URL: item.Link}:
 				}
 			}
 		}
 	}()
 
-	return urlChan, stopSignal
+	return urlChan
 }

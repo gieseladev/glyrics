@@ -1,18 +1,19 @@
-package extractors
+package sources
 
 import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 	"time"
 )
 
-// MusixMatchOrigin is the glyrics.LyricsOrigin for MusixMatch.
-var MusixMatchOrigin = LyricsOrigin{Name: "MusixMatch", Url: "musixmatch.com"}
+// MusixMatchOrigin is the glyrics.Origin for MusixMatch.
+var MusixMatchOrigin = lyrics.Origin{Name: "MusixMatch", Website: "musixmatch.com"}
 
-func ExtractMusixMatchLyrics(req *requests.Request) (*LyricsInfo, error) {
+func ExtractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
 	req.Request().Header.Set(
 		"user-agent",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
@@ -40,7 +41,7 @@ func ExtractMusixMatchLyrics(req *requests.Request) (*LyricsInfo, error) {
 		lyricsBuilder.WriteRune('\n')
 	})
 
-	lyrics := strings.TrimSpace(lyricsBuilder.String())
+	lyricsText := strings.TrimSpace(lyricsBuilder.String())
 	title := strings.TrimSpace(doc.Find("h1.mxm-track-title__track").First().Text())[6:]
 	artist := doc.Find("a.mxm-track-title__artist").First().Text()
 
@@ -51,7 +52,7 @@ func ExtractMusixMatchLyrics(req *requests.Request) (*LyricsInfo, error) {
 		date = time.Time{}
 	}
 
-	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyrics,
+	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyricsText,
 		Origin: MusixMatchOrigin}, nil
 }
 

@@ -1,28 +1,29 @@
-package extractors
+package sources
 
 import (
 	"errors"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	lyrics2 "github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 )
 
-const (
-	// format: `"<title>" lyrics`
-	titlePrefixLen = len(`"`)
-	titleSuffixLen = len(`" lyrics`)
-	titleMinLen    = titlePrefixLen + titleSuffixLen
+// AZLyricsOrigin is the lyrics origin for AZLyrics.
+var AZLyricsOrigin = lyrics2.Origin{Name: "AZLyrics", Website: "azlyrics.com"}
 
-	// format: `<artist> LyricsInfo`
-	artistPrefixLen = 0
-	artistSuffixLen = len(` LyricsInfo`)
-	artistMinLen    = artistPrefixLen + artistSuffixLen
-)
+func ExtractAZLyricsLyrics(req *request.Request) (*lyrics2.Info, error) {
+	const (
+		// format: `"<title>" lyrics`
+		titlePrefixLen = len(`"`)
+		titleSuffixLen = len(`" lyrics`)
+		titleMinLen    = titlePrefixLen + titleSuffixLen
 
-// AZLyricsOrigin is the glyrics.LyricsOrigin for AZLyrics.
-var AZLyricsOrigin = LyricsOrigin{Name: "AZLyrics", Url: "azlyrics.com"}
+		// format: `<artist> Lyrics`
+		artistPrefixLen = 0
+		artistSuffixLen = len(` Lyrics`)
+		artistMinLen    = artistPrefixLen + artistSuffixLen
+	)
 
-func ExtractAZLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
 	req.Request().Header.Set(
 		"user-agent",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
@@ -60,7 +61,7 @@ func ExtractAZLyricsLyrics(req *requests.Request) (*LyricsInfo, error) {
 
 	lyrics := strings.TrimSpace(center.Find("div:not([class])").First().Text())
 
-	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
+	return &lyrics2.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
 		Origin: AZLyricsOrigin}, nil
 }
 

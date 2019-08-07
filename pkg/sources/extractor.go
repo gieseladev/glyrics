@@ -1,37 +1,21 @@
 /*
-Package extractors contains the extractors for gLyrics.
+Package sources contains the extractors for gLyrics.
 */
-package extractors
+package sources
 
 import (
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"sync"
-	"time"
 )
-
-// LyricsOrigin contains the details regarding the origin of lyrics.
-type LyricsOrigin struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
-}
-
-// LyricsInfo represents a song's lyrics and metadata.
-type LyricsInfo struct {
-	Url         string       `json:"url"`
-	Title       string       `json:"title"`
-	Artist      string       `json:"artist"`
-	Lyrics      string       `json:"lyrics"`
-	ReleaseDate time.Time    `json:"release_date,omitempty"`
-	Origin      LyricsOrigin `json:"origin,omitempty"`
-}
 
 var (
 	registeredExtractors = make([]MaybeExtractor, 0)
 	extractorsMux        sync.RWMutex
 )
 
-// RegisterExtractor adds a new Extractor to the registered extractors.
+// RegisterExtractor adds a new Extractor to the registered sources.
 // Registered extractors are returned by GetExtractorsForRequest.
 func RegisterExtractor(e MaybeExtractor) {
 	extractorsMux.Lock()
@@ -40,9 +24,9 @@ func RegisterExtractor(e MaybeExtractor) {
 	registeredExtractors = append(registeredExtractors, e)
 }
 
-// GetExtractorsForRequest returns a slice of all extractors which can extract
+// GetExtractorsForRequest returns a slice of all extractor which can extract
 // lyrics from the given request.
-func GetExtractorsForRequest(req *requests.Request) []Extractor {
+func GetExtractorsForRequest(req *request.Request) []Extractor {
 	extractorsMux.RLock()
 	defer extractorsMux.RUnlock()
 
@@ -59,7 +43,7 @@ func GetExtractorsForRequest(req *requests.Request) []Extractor {
 // Extractor extracts lyrics from a Request.
 type Extractor interface {
 	// ExtractLyrics performs the actual extraction.
-	ExtractLyrics(req *requests.Request) (*LyricsInfo, error)
+	ExtractLyrics(req *request.Request) (*lyrics.Info, error)
 }
 
 // CanExtractTeller can tell whether lyrics can be extracted from the given
@@ -67,7 +51,7 @@ type Extractor interface {
 type CanExtractTeller interface {
 	// CanExtract performs simple checks to determine whether the extractor
 	// has any chance of extracting lyrics from the Request.
-	CanExtract(req *requests.Request) bool
+	CanExtract(req *request.Request) bool
 }
 
 // MaybeExtractor combines Extractor with CanExtractTeller.
@@ -91,9 +75,9 @@ func CreateMaybeExtractor(teller CanExtractTeller, extractor Extractor) MaybeExt
 }
 
 // ExtractorFunc is a function which implements the Extractor interface.
-type ExtractorFunc func(req *requests.Request) (*LyricsInfo, error)
+type ExtractorFunc func(req *request.Request) (*lyrics.Info, error)
 
-func (e ExtractorFunc) ExtractLyrics(req *requests.Request) (*LyricsInfo, error) {
+func (e ExtractorFunc) ExtractLyrics(req *request.Request) (*lyrics.Info, error) {
 	return e(req)
 }
 
@@ -107,6 +91,6 @@ func RegexExtractorTeller(re *regexp.Regexp) CanExtractTeller {
 	return &regexExtractorTeller{re}
 }
 
-func (e *regexExtractorTeller) CanExtract(req *requests.Request) bool {
+func (e *regexExtractorTeller) CanExtract(req *request.Request) bool {
 	return e.MatchString(req.Url)
 }

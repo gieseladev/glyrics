@@ -1,18 +1,19 @@
-package extractors
+package sources
 
 import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gieseladev/glyrics/v3/pkg/requests"
+	"github.com/gieseladev/glyrics/v3/pkg/lyrics"
+	"github.com/gieseladev/glyrics/v3/pkg/request"
 	"regexp"
 	"strings"
 	"time"
 )
 
-// GeniusOrigin is the LyricsOrigin for Genius.
-var GeniusOrigin = LyricsOrigin{Name: "Genius", Url: "genius.com"}
+// GeniusOrigin is the Origin for Genius.
+var GeniusOrigin = lyrics.Origin{Name: "Genius", Website: "genius.com"}
 
-func ExtractGeniusLyrics(req *requests.Request) (*LyricsInfo, error) {
+func ExtractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -32,13 +33,13 @@ func ExtractGeniusLyrics(req *requests.Request) (*LyricsInfo, error) {
 
 	releaseDate, _ := time.Parse("January 2, 2006", rawDate)
 
-	lyrics := strings.TrimSpace(doc.Find("div.lyrics").First().Text())
+	lyricsText := strings.TrimSpace(doc.Find("div.lyrics").First().Text())
 
-	if lyrics == "" {
+	if lyricsText == "" {
 		return nil, errors.New("no lyrics found")
 	}
 
-	return &LyricsInfo{Url: req.Url, Title: title, Artist: artist, Lyrics: lyrics,
+	return &lyrics.Info{Url: req.Url, Title: title, Artist: artist, Lyrics: lyricsText,
 		ReleaseDate: releaseDate,
 		Origin:      GeniusOrigin}, nil
 }

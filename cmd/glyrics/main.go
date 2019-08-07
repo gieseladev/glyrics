@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gieseladev/glyrics/v3"
+	"github.com/gieseladev/glyrics/v3/pkg/search"
 	"github.com/urfave/cli"
-	"log"
 	"os"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func printLyrics(lyrics *glyrics.LyricsInfo) {
@@ -21,13 +23,13 @@ func printLyrics(lyrics *glyrics.LyricsInfo) {
 	}
 
 	headline := headlineBuilder.String()
-	underline := strings.Repeat("=", len(headline))
+	underline := strings.Repeat("=", utf8.RuneCountInString(headline))
 
 	lyricsText := fmt.Sprintf("%s\n%s\n\n%s\n\nfrom %s",
-		headline, underline, lyrics.Lyrics, lyrics.Origin.Url,
+		headline, underline, lyrics.Lyrics, lyrics.Origin.Website,
 	)
 
-	log.Print(lyricsText)
+	fmt.Print(lyricsText)
 }
 
 func searchLyrics(c *cli.Context) {
@@ -37,7 +39,8 @@ func searchLyrics(c *cli.Context) {
 	config, err := GetConfig()
 	if apiKey == "" {
 		if err != nil {
-			log.Fatal("No token passed and couldn't load config file: ", err)
+			fmt.Print("No token passed and couldn't load config file: ", err)
+			os.Exit(1)
 		}
 
 		apiKey = config.GoogleApiKey
@@ -48,21 +51,23 @@ func searchLyrics(c *cli.Context) {
 		_ = CliConfig{GoogleApiKey: apiKey}.SaveConfig()
 	}
 
-	lyrics := glyrics.SearchFirstLyrics(query, apiKey)
+	searcher := &search.GoogleSearcher{APIKey: apiKey}
+	lyrics := glyrics.SearchFirst(context.Background(), searcher, query)
 
 	if lyrics != nil {
 		printLyrics(lyrics)
 	} else {
-		log.Fatal("Couldn't find any results!")
+		fmt.Print("Couldn't find any results!")
 	}
 }
 
 func extractLyrics(c *cli.Context) {
 	url := c.Args().First()
 
-	lyrics, err := glyrics.ExtractLyrics(url)
+	lyrics, err := glyrics.Extract(url)
 	if err != nil {
-		log.Fatal("Couldn't extract lyrics: ", err)
+		fmt.Print("Couldn't extract lyrics: ", err)
+		os.Exit(1)
 	}
 
 	printLyrics(lyrics)
@@ -104,6 +109,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
+		os.Exit(1)
 	}
 }
