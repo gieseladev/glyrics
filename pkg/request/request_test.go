@@ -1,49 +1,41 @@
 package request
 
 import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"net/url"
 	"testing"
 )
 
-func TestRequest_Response(t *testing.T) {
-	request := New("https://www.google.com/")
-	defer request.Close()
-
-	resp, err := request.Response()
+func MustParseURL(rawurl string) *url.URL {
+	u, err := url.Parse(rawurl)
 	if err != nil {
-		t.Error(err)
+		panic(err)
 	}
 
-	if resp == nil {
-		t.Error("Got empty response")
-	}
+	return u
 }
 
 func TestRequest_Text(t *testing.T) {
-	request := New("https://httpbin.org/base64/VGVzdA==")
-	defer request.Close()
+	request := New(MustParseURL("https://httpbin.org/base64/VGVzdA=="))
+	defer func() { _ = request.Close() }()
 
-	text, err := request.Text()
-	if err != nil {
-		t.Error(err)
-	}
+	body, err := request.Body()
+	require.NoError(t, err)
+	data, err := ioutil.ReadAll(body)
+	require.NoError(t, err)
 
-	if text != "Test" {
-		t.Errorf("Incorrect text response %s", text)
-	}
+	assert.Equal(t, "Test", string(data))
 }
 
 func TestRequest_Document(t *testing.T) {
-	request := New("https://www.google.com/")
-	defer request.Close()
+	request := New(MustParseURL("http://example.com/"))
+	defer func() { _ = request.Close() }()
 
 	document, err := request.Document()
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	src, exists := document.Find("#hplogo[alt=\"Google\"]").Attr("src")
-
-	if !(exists && src != "") {
-		t.Error("Couldn't find google logo source in html")
-	}
+	headline := document.Find("div > h1").Text()
+	assert.Equal(t, "Example Domain", headline)
 }

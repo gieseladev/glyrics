@@ -17,7 +17,7 @@ var (
 	LyricalNonsenseExtractor = ExtractorFunc(extractLyricalNonsenseLyrics)
 )
 
-func extractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractLyricalNonsenseLyrics(req request.Requester) (*lyrics.Info, error) {
 	const (
 		titleSuffixLen = len(` 歌詞`)
 		titleMinLen    = titleSuffixLen
@@ -54,13 +54,13 @@ func extractLyricalNonsenseLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(lyricsBuilder.String())
 
-	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL().String(), Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: LyricalNonsenseOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?lyrical-nonsense.com/lyrics/.*`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?lyrical-nonsense.com/lyrics/.*`)),
 		LyricalNonsenseExtractor,
 	))
 }

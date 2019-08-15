@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -68,7 +69,8 @@ func (test *lyricsTestCase) Test(t *testing.T) {
 		return
 	}
 
-	req := request.New(test.Url)
+	req := request.New(MustParseURL(test.Url))
+	defer func() { _ = req.Close() }()
 
 	extractors := GetExtractorsForRequest(req)
 	r.Len(extractors, 1, "must return exactly one extractor")
@@ -78,6 +80,14 @@ func (test *lyricsTestCase) Test(t *testing.T) {
 	r.NoError(err, "extractor returned error")
 
 	test.Check(t, info)
+}
+
+func MustParseURL(s string) *url.URL {
+	u, err := url.Parse(s)
+	if err != nil {
+		panic(err)
+	}
+	return u
 }
 
 func gatherTestCases(t *testing.T) []lyricsTestCase {

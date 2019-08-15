@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gieseladev/glyrics/v3/pkg/request"
+	"log"
 	"net/url"
+	"strconv"
 )
 
 const (
@@ -35,13 +37,16 @@ func (s *Google) Search(ctx context.Context, query string) <-chan Result {
 		cx = googleDefaultCX
 	}
 
-	searchURL := fmt.Sprintf(googleSearchAPIURL+
+	searchURL, err := url.Parse(fmt.Sprintf(googleSearchAPIURL+
 		"?q=%s"+
 		"&key=%s"+
 		"&cx=%s"+
 		"&fields=items(link)"+
-		"&num=%d&start=%%d",
-		url.QueryEscape(query), s.APIKey, cx, itemCount)
+		"&num=%d",
+		url.QueryEscape(query), s.APIKey, cx, itemCount))
+	if err != nil {
+		panic(err)
+	}
 
 	urlChan := make(chan Result, itemCount)
 
@@ -49,18 +54,21 @@ func (s *Google) Search(ctx context.Context, query string) <-chan Result {
 		defer close(urlChan)
 
 		for i := 1; i <= 100; i += itemCount {
-			req := request.NewWithContext(ctx, fmt.Sprintf(searchURL, i))
-			resp, err := req.Response()
+			searchURL.Query().Set("start", strconv.Itoa(i))
+			req := request.NewWithContext(ctx, searchURL)
+			body, err := req.Body()
 			if err != nil {
+				log.Print("glyrics/google: couldn't get body")
 				return
 			}
 
 			var data googleCustomSearchResult
+			err = json.NewDecoder(body).Decode(&data)
 
-			err = json.NewDecoder(resp.Body).Decode(&data)
-			_ = resp.Body.Close()
+			_ = req.Close()
 
 			if err != nil {
+				log.Print("glyrics/google: couldn't decode search response")
 				return
 			}
 

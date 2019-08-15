@@ -18,12 +18,7 @@ var (
 	MusixMatchExtractor = ExtractorFunc(extractMusixMatchLyrics)
 )
 
-func extractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
-	req.Request().Header.Set(
-		"user-agent",
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
-	)
-
+func extractMusixMatchLyrics(req request.Requester) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -57,13 +52,13 @@ func extractMusixMatchLyrics(req *request.Request) (*lyrics.Info, error) {
 		date = time.Time{}
 	}
 
-	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL().String(), Title: title, Artist: artist, ReleaseDate: date, Lyrics: lyricsText,
 		Origin: MusixMatchOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?musixmatch.com/lyrics/.*`)),
 		MusixMatchExtractor,
 	))
 }

@@ -18,7 +18,7 @@ var (
 	GeniusExtractor = ExtractorFunc(extractGeniusLyrics)
 )
 
-func extractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractGeniusLyrics(req request.Requester) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -44,14 +44,14 @@ func extractGeniusLyrics(req *request.Request) (*lyrics.Info, error) {
 		return nil, errors.New("no lyrics found")
 	}
 
-	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL().String(), Title: title, Artist: artist, Lyrics: lyricsText,
 		ReleaseDate: releaseDate,
 		Origin:      GeniusOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?genius.com/.*`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?genius.com/.*`)),
 		GeniusExtractor,
 	))
 }

@@ -18,7 +18,7 @@ var (
 
 var lyricsModeHeaderMatcher = regexp.MustCompile(`\s*(?P<artist>.+?)\s+–\s+(?P<title>.+) (?:lyrics)?`)
 
-func extractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractLyricsModeLyrics(req request.Requester) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -40,13 +40,13 @@ func extractLyricsModeLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(lyricsContainer.Text())
 
-	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL().String(), Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: LyricsModeOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?lyricsmode.com/.*`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?lyricsmode.com/.*`)),
 		LyricsModeExtractor,
 	))
 }

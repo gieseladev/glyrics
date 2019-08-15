@@ -26,7 +26,7 @@ func RegisterExtractor(e MaybeExtractor) {
 
 // GetExtractorsForRequest returns a slice of all extractor which can extract
 // lyrics from the given request.
-func GetExtractorsForRequest(req *request.Request) []Extractor {
+func GetExtractorsForRequest(req request.Requester) []Extractor {
 	extractorsMux.RLock()
 	defer extractorsMux.RUnlock()
 
@@ -43,7 +43,7 @@ func GetExtractorsForRequest(req *request.Request) []Extractor {
 // Extractor extracts lyrics from a Request.
 type Extractor interface {
 	// ExtractLyrics performs the actual extraction.
-	ExtractLyrics(req *request.Request) (*lyrics.Info, error)
+	ExtractLyrics(req request.Requester) (*lyrics.Info, error)
 }
 
 // CanExtractTeller can tell whether lyrics can be extracted from the given
@@ -51,7 +51,7 @@ type Extractor interface {
 type CanExtractTeller interface {
 	// CanExtract performs simple checks to determine whether the extractor
 	// has any chance of extracting lyrics from the Request.
-	CanExtract(req *request.Request) bool
+	CanExtract(req request.Requester) bool
 }
 
 // MaybeExtractor combines Extractor with CanExtractTeller.
@@ -75,24 +75,24 @@ func CreateMaybeExtractor(teller CanExtractTeller, extractor Extractor) MaybeExt
 }
 
 // ExtractorFunc is a function which implements the Extractor interface.
-type ExtractorFunc func(req *request.Request) (*lyrics.Info, error)
+type ExtractorFunc func(req request.Requester) (*lyrics.Info, error)
 
 // ExtractLyrics implements Extractor for extractor functions.
 // It acts as an alias for the function itself.
-func (e ExtractorFunc) ExtractLyrics(req *request.Request) (*lyrics.Info, error) {
+func (e ExtractorFunc) ExtractLyrics(req request.Requester) (*lyrics.Info, error) {
 	return e(req)
 }
 
-type regexExtractorTeller struct {
+type regexCanExtractTeller struct {
 	*regexp.Regexp
 }
 
-// RegexExtractorTeller wraps the regular expression in a struct that implements
+// RegexCanExtractTeller wraps the regular expression in a struct that implements
 // CanExtractTeller.
-func RegexExtractorTeller(re *regexp.Regexp) CanExtractTeller {
-	return &regexExtractorTeller{re}
+func RegexCanExtractTeller(re *regexp.Regexp) CanExtractTeller {
+	return &regexCanExtractTeller{re}
 }
 
-func (e *regexExtractorTeller) CanExtract(req *request.Request) bool {
-	return e.MatchString(req.URL)
+func (e *regexCanExtractTeller) CanExtract(req request.Requester) bool {
+	return e.MatchString(req.URL().String())
 }

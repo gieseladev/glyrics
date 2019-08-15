@@ -6,60 +6,67 @@ package request
 import (
 	"context"
 	"github.com/PuerkitoBio/goquery"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"net/url"
 	"sync"
 )
 
-// Request is a wrapper around a url
-// which makes it easy to access the data
-// it points to.
-type Request struct {
-	URL string
-	ctx context.Context
+// Requester is an interface which provides
+type Requester interface {
+	// Context returns the context used by the request.
+	Context() context.Context
 
-	request  *http.Request
-	respMux  sync.Mutex
+	// Close closes the request.
+	Close() error
+
+	// URL returns the url of the request.
+	URL() *url.URL
+	// Body returns a reader for the request's body.
+	// To close the body, use the Close() method.
+	Body() (io.Reader, error)
+	// Document returns a goquery document for the body.
+	Document() (*goquery.Document, error)
+}
+
+const (
+	userAgent = "gLyrics/3 (https://github.com/gieseladev/glyrics)"
+)
+
+// httpRequest is an implementation of Requester based on the default http
+// library.
+type httpRequest struct {
+	ctx      context.Context
+	mux      sync.Mutex
+	url      *url.URL
 	response *http.Response
-	text     string
 	document *goquery.Document
 }
 
 // New creates a new request and initialises it
 // with the provided url.
-func New(url string) *Request {
-	return NewWithContext(nil, url)
+func New(u *url.URL) Requester {
+	return NewWithContext(nil, u)
 }
 
 // NewWithContext creates a new request with the given context.
 // Note that nil is a valid context.
-func NewWithContext(ctx context.Context, url string) *Request {
-	return &Request{URL: url, ctx: ctx}
+func NewWithContext(ctx context.Context, u *url.URL) Requester {
+	return &httpRequest{url: u, ctx: ctx}
 }
 
 // Close performs cleanup for the Request.
 // This is a no-op if the Request doesn't need cleanup
-func (req *Request) Close() {
+func (req *httpRequest) Close() error {
 	if req.response != nil {
-		_ = req.response.Body.Close()
+		return req.response.Body.Close()
 	}
-}
 
-// Reset closes the request and removes all cached data.
-func (req *Request) Reset() {
-	req.respMux.Lock()
-	defer req.respMux.Unlock()
-
-	req.Close()
-
-	req.request = nil
-	req.response = nil
-	req.text = ""
-	req.document = nil
+	return nil
 }
 
 // Context returns the context of the request.
-func (req *Request) Context() context.Context {
+func (req *httpRequest) Context() context.Context {
 	if req.ctx == nil {
 		return context.Background()
 	}
@@ -67,77 +74,69 @@ func (req *Request) Context() context.Context {
 	return req.ctx
 }
 
-// Request creates an http.Request (GET) for the url
-// and returns it. The request is internally cached
-// so calling this method multiple times will return
-// the same http.Request.
-func (req *Request) Request() *http.Request {
-	if req.request == nil {
-		request, _ := http.NewRequest("GET", req.URL, nil)
-		req.request = request.WithContext(req.Context())
-	}
-
-	return req.request
+// URL returns the url of the request.
+func (req *httpRequest) URL() *url.URL {
+	return req.url
 }
 
-// Response performs the Request.Request and returns the response/error.
-// The Response is internally cached and will be cleaned up by Request.Close.
-func (req *Request) Response() (*http.Response, error) {
-	req.respMux.Lock()
-	defer req.respMux.Unlock()
+// getResponse returns the http.Response.
+// If the response is already cached, it is returned directly.
+// Otherwise a new http request is started.
+// This function DOESN'T use the lock, it is assumed that the caller holds the
+// lock!
+func (req *httpRequest) getResponse() (*http.Response, error) {
+	if req.response != nil {
+		return req.response, nil
+	}
 
-	if req.response == nil {
-		request := req.Request()
+	header := make(http.Header)
+	header.Set("User-Agent", userAgent)
 
-		resp, err := http.DefaultClient.Do(request)
-		if err != nil {
-			return nil, err
-		}
+	request := (&http.Request{
+		Method: "GET",
+		URL:    req.url,
+		Header: header,
+	}).WithContext(req.Context())
 
+	resp, err := http.DefaultClient.Do(request)
+	if err == nil {
 		req.response = resp
 	}
 
-	return req.response, nil
+	return resp, err
 }
 
-// Text retrieves the text response.
-// It reads the text from the Request.Response body.
-// The text is internally cached
-func (req *Request) Text() (string, error) {
-	if req.document == nil {
-		resp, err := req.Response()
-		if err != nil {
-			return "", err
-		}
+// Body returns the http request's body.
+func (req *httpRequest) Body() (io.Reader, error) {
+	req.mux.Lock()
+	defer req.mux.Unlock()
 
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", err
-		}
-
-		text := string(data)
-		req.text = text
+	resp, err := req.getResponse()
+	if err != nil {
+		return nil, err
 	}
 
-	return req.text, nil
+	return resp.Body, nil
 }
 
-// Document returns a goquery.Document for the Request.Response
-// The Document is internally cached.
-func (req *Request) Document() (*goquery.Document, error) {
-	if req.document == nil {
-		resp, err := req.Response()
-		if err != nil {
-			return nil, err
-		}
+// Document returns the goquery.Document for the body.
+func (req *httpRequest) Document() (*goquery.Document, error) {
+	req.mux.Lock()
+	defer req.mux.Unlock()
 
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		req.document = doc
+	if req.document != nil {
+		return req.document, nil
 	}
 
-	return req.document, nil
+	resp, err := req.getResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err == nil {
+		doc.Url = req.url
+	}
+
+	return doc, err
 }

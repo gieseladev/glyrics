@@ -18,7 +18,7 @@ var (
 
 var animeLyricsArtistMatcher = regexp.MustCompile(`Performed by:? (?P<artist>[\w' ]+)\b`)
 
-func extractAnimeLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractAnimeLyricsLyrics(req request.Requester) (*lyrics.Info, error) {
 	doc, err := req.Document()
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func extractAnimeLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText = strings.TrimSpace(strings.Replace(lyricsText, "\u00a0", " ", -1))
 
-	return &lyrics.Info{URL: req.URL,
+	return &lyrics.Info{URL: req.URL().String(),
 		Title: title, Artist: artist,
 		Lyrics: lyricsText,
 		Origin: AnimeLyricsOrigin}, nil
@@ -73,7 +73,7 @@ func extractAnimeLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?animelyrics.com/.*`)),
 		AnimeLyricsExtractor,
 	))
 }

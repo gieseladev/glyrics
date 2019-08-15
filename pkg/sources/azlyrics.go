@@ -16,7 +16,7 @@ var (
 	AZLyricsExtractor = ExtractorFunc(extractAZLyricsLyrics)
 )
 
-func extractAZLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
+func extractAZLyricsLyrics(req request.Requester) (*lyrics.Info, error) {
 	const (
 		// format: `"<title>" lyrics`
 		titlePrefixLen = len(`"`)
@@ -27,11 +27,6 @@ func extractAZLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 		artistPrefixLen = 0
 		artistSuffixLen = len(` Lyrics`)
 		artistMinLen    = artistPrefixLen + artistSuffixLen
-	)
-
-	req.Request().Header.Set(
-		"user-agent",
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
 	)
 
 	doc, err := req.Document()
@@ -66,13 +61,13 @@ func extractAZLyricsLyrics(req *request.Request) (*lyrics.Info, error) {
 
 	lyricsText := strings.TrimSpace(center.Find("div:not([class])").First().Text())
 
-	return &lyrics.Info{URL: req.URL, Title: title, Artist: artist, Lyrics: lyricsText,
+	return &lyrics.Info{URL: req.URL().String(), Title: title, Artist: artist, Lyrics: lyricsText,
 		Origin: AZLyricsOrigin}, nil
 }
 
 func init() {
 	RegisterExtractor(CreateMaybeExtractor(
-		RegexExtractorTeller(regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.+`)),
+		RegexCanExtractTeller(regexp.MustCompile(`https?://(?:www.)?azlyrics.com/.+`)),
 		AZLyricsExtractor,
 	))
 }

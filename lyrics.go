@@ -11,6 +11,7 @@ import (
 	"github.com/gieseladev/glyrics/v3/pkg/search"
 	"github.com/gieseladev/glyrics/v3/pkg/sources"
 	"golang.org/x/sync/semaphore"
+	"net/url"
 	"sync"
 )
 
@@ -23,7 +24,7 @@ type LyricsOrigin = lyrics.Origin
 // ExtractFromRequest tries to extract lyrics from the provided Request.
 // Errors from extracting lyrics are ignored. The only error returned by this
 // function is when no extractor was able to extract any lyrics.
-func ExtractFromRequest(req *request.Request) (*LyricsInfo, error) {
+func ExtractFromRequest(req request.Requester) (*LyricsInfo, error) {
 	for _, e := range sources.GetExtractorsForRequest(req) {
 		if err := req.Context().Err(); err != nil {
 			return nil, err
@@ -37,18 +38,24 @@ func ExtractFromRequest(req *request.Request) (*LyricsInfo, error) {
 		return info, nil
 	}
 
-	return nil, fmt.Errorf("no extractor could extract from %s", req.URL)
+	return nil, fmt.Errorf("no extractor could extract from %s", req.URL().String())
 }
 
 // ExtractWithContext extracts the lyrics from the url using the context.
-func ExtractWithContext(ctx context.Context, url string) (*LyricsInfo, error) {
-	return ExtractFromRequest(request.NewWithContext(ctx, url))
+func ExtractWithContext(ctx context.Context, rawurl string) (*LyricsInfo, error) {
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return nil, err
+	}
+	req := request.NewWithContext(ctx, u)
+	defer func() { _ = req.Close() }()
+	return ExtractFromRequest(req)
 }
 
 // Extract wraps the provided url in a Request and performs
 // ExtractFromRequest.
-func Extract(url string) (*LyricsInfo, error) {
-	return ExtractWithContext(context.Background(), url)
+func Extract(u string) (*LyricsInfo, error) {
+	return ExtractWithContext(context.Background(), u)
 }
 
 type workerCountKey struct{}
@@ -99,8 +106,11 @@ func Search(ctx context.Context, searcher search.Searcher, query string) <-chan 
 				defer sem.Release(1)
 				defer wg.Done()
 
-				req := request.NewWithContext(ctx, result.URL)
+				u, _ := url.Parse(result.URL)
+				req := request.NewWithContext(ctx, u)
 				info, _ := ExtractFromRequest(req)
+				_ = req.Close()
+
 				unorderedLyrics <- lyricsWithIndex{Index: index, Info: info}
 			}(index, result)
 
